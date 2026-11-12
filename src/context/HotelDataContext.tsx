@@ -545,12 +545,40 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         ]);
         playNotificationChime(settings.sound_alerts_enabled);
 
-        // Send email notification to settings.email_notification (default: minhkhang19012006@gmail.com)
-        sendBookingNotificationEmail(newBooking, settings.email_notification).catch(() => {});
-
-        // If Supabase is configured, also persist via atomic PostgreSQL RPC
+        // If Supabase is configured, persist via atomic PostgreSQL RPC and sync official booking_code
         if (isSupabaseConfigured && supabase) {
-          createBookingAtomicRpc(payload).catch(() => {});
+          createBookingAtomicRpc(payload)
+            .then((rpcRes) => {
+              if (rpcRes.success && rpcRes.booking_id && rpcRes.booking_code) {
+                const syncedBooking: Booking = {
+                  ...newBooking,
+                  id: rpcRes.booking_id,
+                  booking_code: rpcRes.booking_code,
+                };
+                setBookings((prev) =>
+                  prev.map((b) => (b.id === newBooking.id ? syncedBooking : b))
+                );
+                sendBookingNotificationEmail(
+                  syncedBooking,
+                  settings.email_notification
+                ).catch(() => {});
+              } else {
+                sendBookingNotificationEmail(
+                  newBooking,
+                  settings.email_notification
+                ).catch(() => {});
+              }
+            })
+            .catch(() => {
+              sendBookingNotificationEmail(
+                newBooking,
+                settings.email_notification
+              ).catch(() => {});
+            });
+        } else {
+          sendBookingNotificationEmail(newBooking, settings.email_notification).catch(
+            () => {}
+          );
         }
 
         return { success: true, booking: newBooking };
@@ -746,10 +774,61 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         },
       ];
     });
+
+    if (isSupabaseConfigured && supabase) {
+      const { media, ...roomRow } = room;
+      supabase
+        .from('rooms')
+        .upsert({
+          id: roomRow.id,
+          room_code: roomRow.room_code,
+          name: roomRow.name,
+          slug: roomRow.slug,
+          room_type: roomRow.room_type,
+          room_type_label: roomRow.room_type_label,
+          bed_count: roomRow.bed_count,
+          max_adults: roomRow.max_adults,
+          max_children: roomRow.max_children,
+          area_sqm: roomRow.area_sqm,
+          price_per_night: roomRow.price_per_night,
+          total_quantity: roomRow.total_quantity,
+          short_description: roomRow.short_description,
+          full_description: roomRow.full_description,
+          policies: roomRow.policies,
+          status: roomRow.status,
+          is_published: roomRow.is_published,
+          is_featured: roomRow.is_featured,
+        })
+        .then(() => {
+          if (media && media.length > 0 && supabase) {
+            supabase
+              .from('room_media')
+              .upsert(
+                media.map((m, idx) => ({
+                  id: m.id,
+                  room_id: room.id,
+                  media_type: m.media_type,
+                  url: m.url,
+                  alt_text: m.alt_text || room.name,
+                  is_primary: idx === 0,
+                  sort_order: idx + 1,
+                }))
+              )
+              .then(() => {});
+          }
+        });
+    }
   }, []);
 
   const deleteRoom = useCallback((roomId: string) => {
     setRooms((prev) => prev.filter((r) => r.id !== roomId));
+    if (isSupabaseConfigured && supabase) {
+      supabase
+        .from('rooms')
+        .delete()
+        .eq('id', roomId)
+        .then(() => {});
+    }
   }, []);
 
   const createContactMessage = useCallback(
@@ -816,16 +895,56 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             : m
         )
       );
+      if (isSupabaseConfigured && supabase) {
+        supabase
+          .from('contact_messages')
+          .update({
+            status,
+            ...(admin_notes !== undefined ? { admin_notes } : {}),
+          })
+          .eq('id', id)
+          .then(() => {});
+      }
     },
     []
   );
 
   const deleteContactMessage = useCallback((id: string) => {
     setContactMessages((prev) => prev.filter((m) => m.id !== id));
+    if (isSupabaseConfigured && supabase) {
+      supabase
+        .from('contact_messages')
+        .delete()
+        .eq('id', id)
+        .then(() => {});
+    }
   }, []);
 
   const updateSettings = useCallback((newSettings: HotelSettings) => {
     setSettings(newSettings);
+    if (isSupabaseConfigured && supabase) {
+      supabase
+        .from('site_settings')
+        .upsert({
+          id: 1,
+          hotel_name: newSettings.hotel_name,
+          tagline: newSettings.tagline,
+          sub_tagline: newSettings.sub_tagline,
+          logo_text: newSettings.logo_text,
+          phone_primary: newSettings.phone_primary,
+          email_notification: newSettings.email_notification,
+          address_text: newSettings.address_text,
+          google_maps_embed_url: newSettings.google_maps_embed_url,
+          check_in_time: newSettings.check_in_time,
+          check_out_time: newSettings.check_out_time,
+          payment_policy_note: newSettings.payment_policy_note,
+          cancellation_policy_summary: newSettings.cancellation_policy_summary,
+          about_title: newSettings.about_title,
+          about_description: newSettings.about_description,
+          sound_alerts_enabled: newSettings.sound_alerts_enabled,
+        })
+        .then(() => {});
+    }
   }, []);
 
   const updatePageSeo = useCallback((updatedSeo: PageSeoConfig) => {
