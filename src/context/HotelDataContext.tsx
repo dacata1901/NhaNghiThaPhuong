@@ -144,6 +144,7 @@ interface HotelDataContextValue {
     paymentStatus?: PaymentStatus
   ) => void;
   updateBookingAdminNotes: (bookingId: string, internalNotes: string) => void;
+  deleteBooking: (bookingId: string) => void;
 
   // Contact helpers
   createContactMessage: (payload: {
@@ -160,42 +161,71 @@ interface HotelDataContextValue {
   ) => void;
   deleteContactMessage: (id: string) => void;
 
-  // Settings & SEO helpers
+  // Settings & SEO & Notification helpers
   updateSettings: (newSettings: HotelSettings) => void;
   updatePageSeo: (updatedSeo: PageSeoConfig) => void;
   markAllNotificationsRead: () => void;
+  deleteNotification: (id: string) => void;
+  clearAllNotifications: () => void;
   resetDemoData: () => void;
 }
 
 const HotelDataContext = createContext<HotelDataContextValue | undefined>(undefined);
 
+function getRoomSortWeight(r: Room): number {
+  if (r.id === 'room-1-bed' || r.room_type === '1_bed' || r.bed_count === 1) return 1;
+  if (r.id === 'room-2-beds' || r.room_type === '2_beds' || r.bed_count === 2) return 2;
+  if (r.id === 'room-3-beds' || r.room_type === '3_beds' || r.bed_count === 3) return 3;
+  return 10 + (r.bed_count || 0);
+}
+
 function normalizeRoomsList(rawRooms: Room[]): Room[] {
   const cleaned = rawRooms.map((r) => {
-    const cleanName = r.name
-      .replace(/\s*\(Standard Single\)/gi, ' (1–2 Người)')
-      .replace(/\s*\(Deluxe Twin\)/gi, ' (2–4 Người)')
-      .replace(/\s*\(Family Suite\)/gi, ' (3 Giường)');
+    let cleanName = r.name
+      .replace(/\s*\(Standard Single\)/gi, '')
+      .replace(/\s*\(Deluxe Twin\)/gi, '')
+      .replace(/\s*\(Family Suite\)/gi, '');
+
+    if (r.id === 'room-1-bed' || r.room_type === '1_bed') {
+      cleanName = 'Phòng 1 Người (1 Giường)';
+    } else if (r.id === 'room-2-beds' || r.room_type === '2_beds') {
+      cleanName = 'Phòng 2 Người (2 Giường)';
+    } else if (r.id === 'room-3-beds' || r.room_type === '3_beds') {
+      cleanName = 'Phòng 3 Người (3 Giường)';
+    }
+
     const cleanFullDesc = (r.full_description || '')
       .replace(/\s*\(Standard Single\)/gi, '')
       .replace(/\s*\(Deluxe Twin\)/gi, '')
       .replace(/\s*\(Family Suite\)/gi, '');
+
     return {
       ...r,
       name: cleanName,
+      room_type_label:
+        r.room_type === '1_bed'
+          ? 'Phòng 1 người'
+          : r.room_type === '2_beds'
+          ? 'Phòng 2 người'
+          : r.room_type === '3_beds'
+          ? 'Phòng 3 người'
+          : r.room_type_label,
       full_description: cleanFullDesc,
     };
   });
 
-  // Đảm bảo luôn có đủ Phòng 3 Người (room-3-beds) nếu dữ liệu cũ từ Supabase/LocalStorage chỉ có 2 phòng
-  const hasThreePersonRoom = cleaned.some(
-    (r) => r.id === 'room-3-beds' || r.room_type === '3_beds'
-  );
-  const seedThreeRoom = INITIAL_ROOMS.find((r) => r.id === 'room-3-beds');
-  if (!hasThreePersonRoom && seedThreeRoom) {
-    cleaned.push(seedThreeRoom);
-  }
+  // Đảm bảo luôn có đủ 3 phòng (Phòng 1 Người, Phòng 2 Người, Phòng 3 Người)
+  INITIAL_ROOMS.forEach((seedRoom) => {
+    const exists = cleaned.some(
+      (r) => r.id === seedRoom.id || r.room_type === seedRoom.room_type
+    );
+    if (!exists) {
+      cleaned.push(seedRoom);
+    }
+  });
 
-  return cleaned;
+  // Sắp xếp cố định theo thứ tự: Phòng 1 người -> Phòng 2 người -> Phòng 3 người
+  return cleaned.sort((a, b) => getRoomSortWeight(a) - getRoomSortWeight(b));
 }
 
 export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -791,19 +821,19 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const saveRoom = useCallback((room: Room) => {
     setRooms((prev) => {
       const exists = prev.some((r) => r.id === room.id);
-      if (exists) {
-        return prev.map((r) =>
-          r.id === room.id ? { ...room, updated_at: new Date().toISOString() } : r
-        );
-      }
-      return [
-        ...prev,
-        {
-          ...room,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ];
+      const next = exists
+        ? prev.map((r) =>
+            r.id === room.id ? { ...room, updated_at: new Date().toISOString() } : r
+          )
+        : [
+            ...prev,
+            {
+              ...room,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            },
+          ];
+      return [...next].sort((a, b) => getRoomSortWeight(a) - getRoomSortWeight(b));
     });
 
     if (isSupabaseConfigured && supabase) {
@@ -984,13 +1014,47 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     );
   }, []);
 
+  const deleteBooking = useCallback((bookingId: string) => {
+    setBookings((prev) => prev.filter((b) => b.id !== bookingId));
+    setBookingHistory((prev) => prev.filter((h) => h.booking_id !== bookingId));
+    if (isSupabaseConfigured && supabase) {
+      supabase
+        .from('bookings')
+        .delete()
+        .eq('id', bookingId)
+        .then(() => {});
+    }
+  }, []);
+
   const markAllNotificationsRead = useCallback(() => {
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
   }, []);
 
+  const deleteNotification = useCallback((id: string) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    if (isSupabaseConfigured && supabase) {
+      supabase
+        .from('admin_notifications')
+        .delete()
+        .eq('id', id)
+        .then(() => {});
+    }
+  }, []);
+
+  const clearAllNotifications = useCallback(() => {
+    setNotifications([]);
+    if (isSupabaseConfigured && supabase) {
+      supabase
+        .from('admin_notifications')
+        .delete()
+        .neq('id', '')
+        .then(() => {});
+    }
+  }, []);
+
   const resetDemoData = useCallback(() => {
     Object.values(STORAGE_KEYS).forEach((k) => localStorage.removeItem(k));
-    setRooms(INITIAL_ROOMS);
+    setRooms(normalizeRoomsList(INITIAL_ROOMS));
     setBookings(INITIAL_BOOKINGS);
     setCustomers(INITIAL_CUSTOMERS);
     setContactMessages(INITIAL_CONTACT_MESSAGES);
@@ -1020,12 +1084,15 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         requestCancelBooking,
         updateBookingStatus,
         updateBookingAdminNotes,
+        deleteBooking,
         createContactMessage,
         updateContactMessageStatus,
         deleteContactMessage,
         updateSettings,
         updatePageSeo,
         markAllNotificationsRead,
+        deleteNotification,
+        clearAllNotifications,
         resetDemoData,
       }}
     >

@@ -8,8 +8,6 @@ import {
   CheckCircle2,
   Printer,
   AlertCircle,
-  Phone,
-  MessageSquare,
   Check,
   Clock,
   Calendar,
@@ -40,21 +38,20 @@ const quickBookingSchema = z.object({
 
 type QuickBookingFormValues = z.infer<typeof quickBookingSchema>;
 
-const ARRIVAL_TIME_OPTIONS = [
-  'Nhận phòng ngay',
-  '08:00 - 10:00',
-  '10:00 - 12:00',
-  '12:00 - 14:00',
-  '14:00 - 16:00',
-  '16:00 - 18:00',
-  '18:00 - 20:00',
-  '20:00 - 22:00',
-  'Sau 22:00 đêm',
+const QUICK_TIME_PRESETS = [
+  { label: '08:00 Sáng', value: '08:00' },
+  { label: '10:00 Sáng', value: '10:00' },
+  { label: '12:00 Trưa', value: '12:00' },
+  { label: '14:00 Chiều', value: '14:00' },
+  { label: '16:00 Chiều', value: '16:00' },
+  { label: '18:00 Tối', value: '18:00' },
+  { label: '20:00 Tối', value: '20:00' },
+  { label: '22:00 Đêm', value: '22:00' },
 ];
 
 export const BookingPage: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const { rooms, settings, createBooking } = useHotelData();
+  const { rooms, createBooking } = useHotelData();
 
   const publishedRooms = useMemo(
     () => rooms.filter((r) => r.is_published),
@@ -77,7 +74,7 @@ export const BookingPage: React.FC = () => {
   const [checkInDate, setCheckInDate] = useState(
     searchParams.get('checkIn') || getDefaultCheckInDate()
   );
-  const [arrivalTime, setArrivalTime] = useState<string>('14:00 - 16:00');
+  const [arrivalTime, setArrivalTime] = useState<string>('14:00');
   const [nightsCount, setNightsCount] = useState<number>(1);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -108,6 +105,11 @@ export const BookingPage: React.FC = () => {
     [checkInDate, nightsCount]
   );
 
+  const formattedArrivalDetail = useMemo(
+    () => `${arrivalTime} — Ngày ${formatDateVN(checkInDate)}`,
+    [arrivalTime, checkInDate]
+  );
+
   // Bước 1: Mở hộp thoại xác nhận thông tin trước khi gửi
   const onPreSubmit = (values: QuickBookingFormValues) => {
     setBookingError(null);
@@ -124,7 +126,7 @@ export const BookingPage: React.FC = () => {
 
     setIsSubmitting(true);
     const combinedNote = [
-      `Giờ nhận phòng: ${arrivalTime}`,
+      `Giờ nhận phòng: ${arrivalTime} (Ngày ${formatDateVN(checkInDate)})`,
       pendingFormValues.customer_notes?.trim() || '',
     ]
       .filter(Boolean)
@@ -138,7 +140,7 @@ export const BookingPage: React.FC = () => {
         guest_email: '',
         check_in_date: checkInDate,
         check_out_date: checkOutDate,
-        adults_count: selectedRoom.max_adults || 2,
+        adults_count: selectedRoom.bed_count || 1,
         children_count: 0,
         customer_notes: combinedNote,
       });
@@ -165,7 +167,7 @@ export const BookingPage: React.FC = () => {
       />
 
       <section className="pt-28 pb-16 min-h-screen bg-bg-ivory">
-        <div className="container-luxury max-w-2xl mx-auto">
+        <div className="container-luxury max-w-3xl mx-auto">
           {createdBooking && selectedRoom ? (
             /* Màn hình xác nhận sau khi đặt xong */
             <div className="bg-bg-ivory-white border-2 border-brand-gold rounded-2xl p-6 sm:p-8 shadow-luxury-lg text-center">
@@ -175,90 +177,69 @@ export const BookingPage: React.FC = () => {
               <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary">
                 Đã Gửi Yêu Cầu Đặt Phòng!
               </h1>
-              <p className="text-sm text-text-secondary mt-1.5">
-                Cảm ơn <strong>{createdBooking.guest_name}</strong> (<strong>{createdBooking.guest_phone}</strong>). Lễ tân Nhà Nghỉ Tha Phương đã nhận được thông tin đặt phòng của bạn.
+              <p className="text-sm sm:text-base font-semibold text-text-secondary mt-1.5">
+                Cảm ơn <strong>{createdBooking.guest_name}</strong> (<strong>{createdBooking.guest_phone}</strong>). Nhà Nghỉ Tha Phương đã ghi nhận lịch nhận phòng của bạn.
               </p>
 
-              <div className="my-5 text-left bg-bg-ivory rounded-2xl p-5 border border-border-default space-y-2.5 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-text-secondary font-medium">Khách đặt phòng:</span>
-                  <strong className="text-text-primary font-extrabold">
+              <div className="my-6 text-left bg-bg-ivory rounded-2xl p-5 border border-border-default space-y-3 text-sm">
+                <div className="flex justify-between gap-2">
+                  <span className="text-text-secondary font-semibold">Khách đặt phòng:</span>
+                  <strong className="text-text-primary font-extrabold text-right">
                     {createdBooking.guest_name}
                   </strong>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary font-medium">Số điện thoại:</span>
-                  <strong className="text-brand-gold-dark font-extrabold">
+                <div className="flex justify-between gap-2">
+                  <span className="text-text-secondary font-semibold">Số điện thoại:</span>
+                  <strong className="text-brand-gold-dark font-extrabold text-right">
                     {createdBooking.guest_phone}
                   </strong>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary font-medium">Loại phòng đăng ký:</span>
-                  <strong className="text-text-primary font-extrabold">
-                    {selectedRoom.name}
+                <div className="flex justify-between gap-2">
+                  <span className="text-text-secondary font-semibold">Loại phòng đăng ký:</span>
+                  <strong className="text-text-primary font-extrabold text-right">
+                    {selectedRoom.name} ({selectedRoom.room_code})
                   </strong>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary font-medium">Ngày nhận phòng:</span>
-                  <strong className="text-text-primary font-extrabold">
-                    {formatDateVN(createdBooking.check_in_date)} ({createdBooking.nights_count} đêm)
+                <div className="flex justify-between gap-2">
+                  <span className="text-text-secondary font-semibold">Thời gian nhận phòng cụ thể:</span>
+                  <strong className="text-state-success font-extrabold text-right">
+                    Lúc {arrivalTime} — Ngày {formatDateVN(createdBooking.check_in_date)}
                   </strong>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-secondary font-medium">Thời gian nhận phòng:</span>
-                  <strong className="text-state-success font-extrabold">
-                    {arrivalTime}
+                <div className="flex justify-between gap-2">
+                  <span className="text-text-secondary font-semibold">Số đêm lưu trú:</span>
+                  <strong className="text-text-primary font-extrabold text-right">
+                    {createdBooking.nights_count} đêm (Trả phòng: {formatDateVN(createdBooking.check_out_date)})
                   </strong>
-                </div>
-              </div>
-
-              {/* Nút gọi điện hoặc nhắn SMS trực tiếp cho chủ nhà */}
-              <div className="p-4 rounded-2xl bg-bg-cream/60 border border-border-default mb-6">
-                <p className="text-xs font-bold text-text-secondary mb-2.5">
-                  Bấm để Gọi điện hoặc Nhắn SMS xác nhận nhanh với lễ tân:
-                </p>
-                <div className="flex flex-wrap items-center justify-center gap-3">
-                  <a
-                    href={`tel:${settings.phone_primary.replace(/\s+/g, '')}`}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-state-success text-white text-xs font-extrabold hover:opacity-95"
-                  >
-                    <Phone className="w-4 h-4" /> Gọi: {settings.phone_primary}
-                  </a>
-                  <a
-                    href={`sms:${settings.phone_primary.replace(/\s+/g, '')}?body=${encodeURIComponent(`Toi la ${createdBooking.guest_name} (${createdBooking.guest_phone}) vua dat ${selectedRoom.name} nhan phong luc ${arrivalTime} ngay ${formatDateVN(createdBooking.check_in_date)}`)}`}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-gold text-white text-xs font-extrabold hover:opacity-95"
-                  >
-                    <MessageSquare className="w-4 h-4" /> Gửi SMS cho Lễ tân
-                  </a>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center justify-center gap-3">
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="secondary"
                   onClick={() => window.print()}
                   leftIcon={<Printer className="w-4 h-4" />}
-                  className="rounded-xl font-bold"
+                  className="rounded-xl font-extrabold"
                 >
                   In phiếu đặt phòng
                 </Button>
                 <Link to="/">
-                  <Button variant="primary" className="rounded-xl font-bold">
+                  <Button variant="primary" className="rounded-xl font-extrabold">
                     Về trang chủ
                   </Button>
                 </Link>
               </div>
             </div>
           ) : (
-            /* KHUNG ĐẶT PHÒNG ĐƠN GIẢN DUY NHẤT */
-            <div className="bg-bg-ivory-white border border-border-default rounded-2xl p-6 sm:p-8 shadow-luxury-lg">
+            /* KHUNG ĐẶT PHÒNG ĐƠN GIẢN, RÕ RÀNG */
+            <div className="bg-bg-ivory-white border border-border-default rounded-2xl p-5 sm:p-8 shadow-luxury-lg">
               <div className="text-center mb-6">
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary">
                   Đăng Ký Đặt Phòng
                 </h1>
-                <p className="text-sm text-text-secondary mt-1 font-medium">
-                  Chọn loại phòng bạn muốn đặt, nhập Tên, Số điện thoại và Giờ nhận phòng
+                <p className="text-sm sm:text-base text-text-secondary mt-1 font-semibold">
+                  Chọn loại phòng theo thứ tự (1 Người, 2 Người, 3 Người), nhập Tên, Số điện thoại và Giờ nhận phòng cụ thể
                 </p>
               </div>
 
@@ -269,13 +250,13 @@ export const BookingPage: React.FC = () => {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit(onPreSubmit)} className="space-y-5" noValidate>
-                {/* 1. Chọn loại phòng */}
+              <form onSubmit={handleSubmit(onPreSubmit)} className="space-y-6" noValidate>
+                {/* 1. Chọn loại phòng (Theo đúng thứ tự: Phòng 1 Người -> Phòng 2 Người -> Phòng 3 Người) */}
                 <div>
-                  <label className="block text-sm font-extrabold text-text-primary mb-2.5">
-                    1. Bạn muốn đặt phòng nào?
+                  <label className="block text-sm sm:text-base font-extrabold text-text-primary mb-3">
+                    1. Chọn loại phòng bạn muốn đặt:
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                     {publishedRooms.map((room) => {
                       const isSelected = selectedRoom?.id === room.id;
                       const thumb = room.media?.[0]?.url || '';
@@ -287,20 +268,20 @@ export const BookingPage: React.FC = () => {
                             setSelectedRoomId(room.id);
                             setBookingError(null);
                           }}
-                          className={`p-3.5 rounded-2xl border-2 text-left transition-all flex items-center gap-3.5 ${
+                          className={`p-3.5 rounded-2xl border-2 text-left transition-all flex sm:flex-col items-center sm:items-stretch gap-3 ${
                             isSelected
-                              ? 'border-brand-gold bg-brand-gold/10 shadow-sm'
-                              : 'border-border-default hover:border-brand-gold/50 bg-bg-ivory/60'
+                              ? 'border-brand-gold bg-brand-gold/15 shadow-sm'
+                              : 'border-border-default hover:border-brand-gold/60 bg-bg-ivory/70'
                           }`}
                         >
                           <img
                             src={thumb}
                             alt={room.name}
-                            className="w-16 h-16 rounded-xl object-cover shrink-0"
+                            className="w-16 h-16 sm:w-full sm:h-28 rounded-xl object-cover shrink-0"
                           />
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-1">
-                              <span className="font-extrabold text-sm text-text-primary truncate">
+                            <div className="flex items-start justify-between gap-1">
+                              <span className="font-extrabold text-sm text-text-primary leading-snug">
                                 {room.name}
                               </span>
                               {isSelected && (
@@ -310,10 +291,7 @@ export const BookingPage: React.FC = () => {
                               )}
                             </div>
                             <span className="text-xs font-bold text-text-secondary mt-1 block">
-                              {room.bed_count} giường đôi • Tối đa {room.max_adults} người
-                            </span>
-                            <span className="text-[11px] font-bold text-brand-gold-dark mt-0.5 block">
-                              Mã phòng: {room.room_code}
+                              {room.bed_count} giường ngủ • Mã: {room.room_code}
                             </span>
                           </div>
                         </button>
@@ -324,13 +302,13 @@ export const BookingPage: React.FC = () => {
 
                 {/* 2. Họ tên & Số điện thoại */}
                 <div>
-                  <label className="block text-sm font-extrabold text-text-primary mb-2.5">
-                    2. Thông tin khách đặt phòng
+                  <label className="block text-sm sm:text-base font-extrabold text-text-primary mb-3">
+                    2. Thông tin khách đặt phòng:
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <InputField
                       label="Họ và tên của bạn"
-                      placeholder="Ví dụ: Anh Khang"
+                      placeholder="Ví dụ: Nguyễn Văn An"
                       required
                       error={errors.guest_name?.message}
                       {...register('guest_name')}
@@ -346,15 +324,16 @@ export const BookingPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* 3. Ngày nhận phòng, Giờ nhận phòng & Số đêm */}
-                <div>
-                  <label className="block text-sm font-extrabold text-text-primary mb-2.5">
-                    3. Ngày &amp; Thời gian nhận phòng
+                {/* 3. Thời gian nhận phòng cụ thể (Ngày + Giờ phút chính xác) */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-bg-ivory border border-border-default space-y-4">
+                  <label className="block text-sm sm:text-base font-extrabold text-text-primary">
+                    3. Thời gian nhận phòng cụ thể:
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <span className="text-xs font-bold text-text-secondary mb-1.5 flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5 text-brand-gold-dark" />
+                      <span className="text-xs font-extrabold text-text-primary mb-1.5 flex items-center gap-1.5">
+                        <Calendar className="w-4 h-4 text-brand-gold-dark" />
                         Ngày đến nhận phòng
                       </span>
                       <input
@@ -362,33 +341,51 @@ export const BookingPage: React.FC = () => {
                         min={dayjs().format('YYYY-MM-DD')}
                         value={checkInDate}
                         onChange={(e) => setCheckInDate(e.target.value)}
-                        className="w-full h-11 px-3.5 rounded-xl bg-bg-ivory border border-border-default text-sm font-bold text-text-primary focus:outline-none focus:border-brand-gold"
+                        className="w-full h-11 px-3.5 rounded-xl bg-bg-ivory-white border border-border-strong text-sm font-extrabold text-text-primary focus:outline-none focus:border-brand-gold"
                       />
                     </div>
 
                     <div>
-                      <span className="text-xs font-bold text-text-secondary mb-1.5 flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-brand-gold-dark" />
-                        Thời gian (Giờ) nhận phòng dự kiến
+                      <span className="text-xs font-extrabold text-text-primary mb-1.5 flex items-center gap-1.5">
+                        <Clock className="w-4 h-4 text-brand-gold-dark" />
+                        Giờ &amp; Phút nhận phòng dự kiến
                       </span>
-                      <select
+                      <input
+                        type="time"
                         value={arrivalTime}
-                        onChange={(e) => setArrivalTime(e.target.value)}
-                        className="w-full h-11 px-3.5 rounded-xl bg-bg-ivory border border-border-default text-sm font-bold text-text-primary focus:outline-none focus:border-brand-gold"
-                      >
-                        {ARRIVAL_TIME_OPTIONS.map((t) => (
-                          <option key={t} value={t}>
-                            {t}
-                          </option>
-                        ))}
-                      </select>
+                        onChange={(e) => setArrivalTime(e.target.value || '14:00')}
+                        className="w-full h-11 px-3.5 rounded-xl bg-bg-ivory-white border border-border-strong text-sm font-extrabold text-text-primary focus:outline-none focus:border-brand-gold"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Nút chọn nhanh mốc giờ cụ thể */}
+                  <div>
+                    <span className="block text-xs font-bold text-text-secondary mb-2">
+                      Hoặc bấm chọn nhanh mốc giờ nhận phòng:
+                    </span>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {QUICK_TIME_PRESETS.map((preset) => (
+                        <button
+                          key={preset.value}
+                          type="button"
+                          onClick={() => setArrivalTime(preset.value)}
+                          className={`py-2 px-2.5 rounded-xl text-xs font-extrabold border transition-all ${
+                            arrivalTime === preset.value
+                              ? 'bg-bg-wood-deep text-white border-bg-wood-deep shadow-xs'
+                              : 'bg-bg-ivory-white text-text-primary border-border-default hover:border-brand-gold'
+                          }`}
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
                   {/* Chọn nhanh số đêm */}
-                  <div className="mt-3.5">
-                    <span className="block text-xs font-bold text-text-secondary mb-1.5">
-                      Thời gian lưu trú dự kiến
+                  <div className="pt-2 border-t border-border-default">
+                    <span className="block text-xs font-extrabold text-text-primary mb-2">
+                      Số đêm lưu trú dự kiến:
                     </span>
                     <div className="grid grid-cols-4 gap-2">
                       {[1, 2, 3, 4].map((n) => (
@@ -398,8 +395,8 @@ export const BookingPage: React.FC = () => {
                           onClick={() => setNightsCount(n)}
                           className={`h-10 rounded-xl text-xs sm:text-sm font-extrabold border transition-all ${
                             nightsCount === n
-                              ? 'bg-bg-wood-deep text-brand-gold-light border-bg-wood-deep'
-                              : 'bg-bg-ivory text-text-primary border-border-default hover:border-brand-gold'
+                              ? 'bg-brand-gold text-white border-brand-gold shadow-xs'
+                              : 'bg-bg-ivory-white text-text-primary border-border-default hover:border-brand-gold'
                           }`}
                         >
                           {n} đêm
@@ -407,50 +404,40 @@ export const BookingPage: React.FC = () => {
                       ))}
                     </div>
                   </div>
+
+                  {/* Khung tóm tắt thời gian nhận/trả cụ thể */}
+                  <div className="p-3 rounded-xl bg-brand-champagne/45 border border-brand-gold/40 text-xs sm:text-sm font-bold text-text-primary flex flex-wrap items-center justify-between gap-2">
+                    <span>
+                      Nhận phòng: <strong className="text-state-success">{formattedArrivalDetail}</strong>
+                    </span>
+                    <span>
+                      Trả phòng dự kiến: <strong>{formatDateVN(checkOutDate)}</strong>
+                    </span>
+                  </div>
                 </div>
 
                 {/* Ghi chú ngắn gọn */}
                 <div>
                   <input
                     type="text"
-                    placeholder="Ghi chú thêm nếu có (Ví dụ: Đi 2 người, cần phòng tầng trệt)..."
-                    className="w-full h-11 px-4 rounded-xl bg-bg-ivory border border-border-default text-sm font-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold"
+                    placeholder="Ghi chú thêm nếu có (Ví dụ: Nhận phòng trễ, cần phòng tầng trệt)..."
+                    className="w-full h-11 px-4 rounded-xl bg-bg-ivory border border-border-default text-sm font-semibold text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold"
                     {...register('customer_notes')}
                   />
                 </div>
 
-                {/* Nút Đặt Phòng & Gọi / SMS */}
-                <div className="pt-2">
+                {/* Nút Đặt Phòng */}
+                <div className="pt-1">
                   <Button
                     type="submit"
                     variant="primary"
                     size="lg"
                     fullWidth
                     isLoading={isSubmitting}
-                    className="h-12 rounded-2xl text-base font-extrabold"
+                    className="h-13 rounded-2xl text-base font-extrabold shadow-luxury"
                   >
-                    Xác Nhận Đặt Phòng Ngay
+                    Kiểm Tra &amp; Xác Nhận Đặt Phòng
                   </Button>
-
-                  <div className="mt-4 pt-4 border-t border-border-default flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <span className="font-bold text-text-secondary">
-                      Liên hệ trực tiếp lễ tân 24/7:
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <a
-                        href={`tel:${settings.phone_primary.replace(/\s+/g, '')}`}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-state-success/15 text-state-success font-extrabold border border-state-success/30"
-                      >
-                        <Phone className="w-3.5 h-3.5" /> Gọi: {settings.phone_primary}
-                      </a>
-                      <a
-                        href={`sms:${settings.phone_primary.replace(/\s+/g, '')}?body=Xin%20chao%20Nha%20Nghi%20Tha%20Phuong,%20toi%20muon%20dat%20phong`}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-brand-gold/15 text-brand-gold-dark font-extrabold border border-brand-gold/30"
-                      >
-                        <MessageSquare className="w-3.5 h-3.5" /> Nhắn SMS
-                      </a>
-                    </div>
-                  </div>
                 </div>
               </form>
             </div>
@@ -466,7 +453,7 @@ export const BookingPage: React.FC = () => {
         isLoading={isSubmitting}
         variant="confirm"
         title="Xác nhận thông tin đặt phòng?"
-        description="Vui lòng kiểm tra lại thông tin đặt phòng của bạn một lần nữa trước khi gửi cho lễ tân:"
+        description="Vui lòng kiểm tra lại thông tin đặt phòng và giờ nhận phòng cụ thể của bạn một lần nữa:"
         confirmLabel="Đồng ý đặt phòng"
         cancelLabel="Quay lại sửa"
         details={
@@ -475,9 +462,14 @@ export const BookingPage: React.FC = () => {
                 { label: 'Họ và tên khách', value: pendingFormValues.guest_name },
                 { label: 'Số điện thoại', value: pendingFormValues.guest_phone },
                 { label: 'Loại phòng đặt', value: selectedRoom.name },
-                { label: 'Ngày nhận phòng', value: formatDateVN(checkInDate) },
-                { label: 'Giờ nhận phòng', value: arrivalTime },
-                { label: 'Số đêm ở', value: `${nightsCount} đêm` },
+                {
+                  label: 'Thời gian nhận phòng',
+                  value: `Lúc ${arrivalTime} — Ngày ${formatDateVN(checkInDate)}`,
+                },
+                {
+                  label: 'Thời gian lưu trú',
+                  value: `${nightsCount} đêm (Trả phòng: ${formatDateVN(checkOutDate)})`,
+                },
               ]
             : []
         }

@@ -8,8 +8,6 @@ import { RoomDetailPage } from '@/pages/public/RoomDetailPage';
 import { BookingPage } from '@/pages/public/BookingPage';
 import { AboutPage } from '@/pages/public/AboutPage';
 import { ContactPage } from '@/pages/public/ContactPage';
-import { FaqPage } from '@/pages/public/FaqPage';
-import { PolicyPage } from '@/pages/public/PolicyPage';
 import { NotFoundPage } from '@/pages/public/NotFoundPage';
 
 // Admin Dashboard Pages
@@ -42,25 +40,16 @@ export const AppRoutes: React.FC = () => {
           <Route path="/rooms" element={<RoomListPage />} />
           <Route path="/rooms/:slug" element={<RoomDetailPage />} />
           <Route path="/booking" element={<BookingPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           {/* Redirect removed pages cleanly */}
           <Route path="/booking-lookup" element={<Navigate to="/booking" replace />} />
           <Route path="/design-system" element={<Navigate to="/" replace />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/faq" element={<FaqPage />} />
-          <Route
-            path="/booking-policy"
-            element={<PolicyPage policyType="booking-policy" />}
-          />
-          <Route
-            path="/cancellation-policy"
-            element={<PolicyPage policyType="cancellation-policy" />}
-          />
-          <Route
-            path="/privacy-policy"
-            element={<PolicyPage policyType="privacy-policy" />}
-          />
-          <Route path="/terms" element={<PolicyPage policyType="terms" />} />
+          <Route path="/faq" element={<Navigate to="/" replace />} />
+          <Route path="/booking-policy" element={<Navigate to="/" replace />} />
+          <Route path="/cancellation-policy" element={<Navigate to="/" replace />} />
+          <Route path="/privacy-policy" element={<Navigate to="/" replace />} />
+          <Route path="/terms" element={<Navigate to="/" replace />} />
           <Route path="/404" element={<NotFoundPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>

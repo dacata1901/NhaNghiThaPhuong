@@ -13,11 +13,12 @@ import {
   CheckCheck,
   Volume2,
   VolumeX,
-  Phone,
+  Trash2,
 } from 'lucide-react';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import { useHotelData } from '@/context/HotelDataContext';
 import { SEOHead } from '@/components/common/SEOHead';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { cn, formatDateTimeVN } from '@/lib/utils';
 
 const ADMIN_NAV_ITEMS = [
@@ -33,6 +34,8 @@ export const AdminLayout: React.FC = () => {
   const {
     notifications,
     markAllNotificationsRead,
+    deleteNotification,
+    clearAllNotifications,
     bookings,
     contactMessages,
     settings,
@@ -42,6 +45,7 @@ export const AdminLayout: React.FC = () => {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [confirmClearNotifOpen, setConfirmClearNotifOpen] = useState(false);
 
   if (!isAuthenticated) {
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
@@ -58,6 +62,11 @@ export const AdminLayout: React.FC = () => {
     });
   };
 
+  const handleConfirmClearAllNotifs = () => {
+    clearAllNotifications();
+    setConfirmClearNotifOpen(false);
+  };
+
   return (
     <div className="min-h-screen flex bg-bg-ivory text-text-primary">
       <SEOHead
@@ -70,24 +79,24 @@ export const AdminLayout: React.FC = () => {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-40 w-[270px] bg-bg-wood-deep text-text-on-dark flex flex-col justify-between transition-transform duration-200 lg:static lg:translate-x-0 shrink-0 shadow-luxury-lg',
+          'fixed inset-y-0 left-0 z-40 w-[270px] bg-bg-wood-deep text-white flex flex-col justify-between transition-transform duration-200 lg:static lg:translate-x-0 shrink-0 shadow-luxury-lg',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
         <div>
-          <div className="px-6 py-6 border-b border-white/10 flex items-center justify-between">
+          <div className="px-6 py-6 border-b border-white/15 flex items-center justify-between">
             <div>
               <span className="font-serif text-lg font-extrabold tracking-[0.12em] uppercase text-brand-gold-light block">
                 QUẢN TRỊ THA PHƯƠNG
               </span>
-              <span className="text-xs font-semibold text-text-on-dark/70">
+              <span className="text-xs font-semibold text-white/75">
                 Hệ thống quản lý chủ nhà
               </span>
             </div>
             <button
               type="button"
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden text-text-on-dark/70 hover:text-white"
+              className="lg:hidden text-white/80 hover:text-white"
             >
               <X className="w-5 h-5" />
             </button>
@@ -113,8 +122,8 @@ export const AdminLayout: React.FC = () => {
                     cn(
                       'flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-bold transition-all',
                       isActive
-                        ? 'bg-brand-gold text-text-on-dark font-extrabold shadow-sm'
-                        : 'text-text-on-dark/80 hover:bg-white/10 hover:text-white'
+                        ? 'bg-brand-gold text-white font-extrabold shadow-sm'
+                        : 'text-white/85 hover:bg-white/10 hover:text-white'
                     )
                   }
                 >
@@ -133,12 +142,12 @@ export const AdminLayout: React.FC = () => {
           </nav>
         </div>
 
-        <div className="p-4 border-t border-white/10 space-y-2.5">
-          <div className="px-4 py-2.5 rounded-xl bg-white/5 text-xs text-text-on-dark/80">
+        <div className="p-4 border-t border-white/15 space-y-2.5">
+          <div className="px-4 py-2.5 rounded-xl bg-white/10 text-xs text-white/90">
             <span className="block font-extrabold text-brand-gold-light">
               {adminUser?.name}
             </span>
-            <span className="block truncate text-[11px] text-text-on-dark/65">
+            <span className="block truncate text-[11px] text-white/75">
               {adminUser?.email}
             </span>
           </div>
@@ -169,10 +178,8 @@ export const AdminLayout: React.FC = () => {
               <h1 className="font-serif text-lg sm:text-xl font-extrabold text-text-primary">
                 Quản lý {settings.hotel_name}
               </h1>
-              <p className="text-xs font-semibold text-text-secondary hidden sm:flex items-center gap-2">
-                <Phone className="w-3.5 h-3.5 text-brand-gold-dark" />
-                Số điện thoại: <strong>{settings.phone_primary}</strong> • Email:{' '}
-                <strong>{settings.email_notification}</strong>
+              <p className="text-xs font-semibold text-text-secondary hidden sm:block">
+                Email nhận thông báo: <strong>{settings.email_notification}</strong>
               </p>
             </div>
           </div>
@@ -182,9 +189,9 @@ export const AdminLayout: React.FC = () => {
               type="button"
               onClick={toggleSoundAlerts}
               className={cn(
-                'p-2.5 rounded-xl border text-xs flex items-center gap-1.5 font-bold transition-colors',
+                'p-2.5 rounded-xl border text-xs flex items-center gap-1.5 font-extrabold transition-colors',
                 settings.sound_alerts_enabled
-                  ? 'border-brand-gold bg-brand-champagne/40 text-bg-wood-deep'
+                  ? 'border-brand-gold bg-brand-champagne/50 text-text-primary'
                   : 'border-border-default bg-bg-ivory text-text-muted'
               )}
               title="Bật/tắt âm thanh chuông báo khi có đơn mới"
@@ -216,47 +223,69 @@ export const AdminLayout: React.FC = () => {
 
               {notifOpen && (
                 <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-bg-ivory-white border border-border-strong rounded-2xl shadow-luxury-lg z-50 overflow-hidden">
-                  <div className="px-4 py-3 bg-bg-cream border-b border-border-default flex items-center justify-between">
+                  <div className="px-4 py-3 bg-bg-cream border-b border-border-default flex flex-wrap items-center justify-between gap-2">
                     <span className="text-xs font-extrabold uppercase tracking-wider text-text-primary">
-                      Thông báo ({unreadNotifCount} mới)
+                      Thông báo ({notifications.length})
                     </span>
-                    {unreadNotifCount > 0 && (
-                      <button
-                        type="button"
-                        onClick={markAllNotificationsRead}
-                        className="text-xs font-extrabold text-brand-gold-dark hover:underline flex items-center gap-1"
-                      >
-                        <CheckCheck className="w-3.5 h-3.5" />
-                        Đã đọc hết
-                      </button>
-                    )}
+                    <div className="flex items-center gap-3">
+                      {unreadNotifCount > 0 && (
+                        <button
+                          type="button"
+                          onClick={markAllNotificationsRead}
+                          className="text-xs font-extrabold text-brand-gold-dark hover:underline flex items-center gap-1"
+                        >
+                          <CheckCheck className="w-3.5 h-3.5" />
+                          Đã đọc
+                        </button>
+                      )}
+                      {notifications.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setConfirmClearNotifOpen(true)}
+                          className="text-xs font-extrabold text-state-danger hover:underline flex items-center gap-1"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Xóa hết
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="max-h-80 overflow-y-auto divide-y divide-border-default">
                     {notifications.length === 0 ? (
-                      <div className="p-6 text-center text-xs font-semibold text-text-muted">
-                        Chưa có thông báo mới.
+                      <div className="p-6 text-center text-xs font-bold text-text-muted">
+                        Không có thông báo nào.
                       </div>
                     ) : (
-                      notifications.slice(0, 12).map((n) => (
+                      notifications.slice(0, 15).map((n) => (
                         <div
                           key={n.id}
                           className={cn(
-                            'p-3.5 text-xs transition-colors',
-                            !n.is_read ? 'bg-brand-champagne/25' : 'bg-bg-ivory-white'
+                            'p-3.5 text-xs transition-colors flex items-start justify-between gap-2.5',
+                            !n.is_read ? 'bg-brand-champagne/30' : 'bg-bg-ivory-white'
                           )}
                         >
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="font-extrabold text-text-primary">
-                              {n.title}
-                            </span>
-                            <span className="text-[10px] font-semibold text-text-muted shrink-0">
-                              {formatDateTimeVN(n.created_at)}
-                            </span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-extrabold text-text-primary truncate">
+                                {n.title}
+                              </span>
+                              <span className="text-[10px] font-bold text-text-muted shrink-0">
+                                {formatDateTimeVN(n.created_at)}
+                              </span>
+                            </div>
+                            <p className="font-semibold text-text-secondary mt-1">
+                              {n.message}
+                            </p>
                           </div>
-                          <p className="font-medium text-text-secondary mt-1">
-                            {n.message}
-                          </p>
+                          <button
+                            type="button"
+                            onClick={() => deleteNotification(n.id)}
+                            className="p-1.5 rounded-lg text-text-muted hover:text-state-danger hover:bg-state-danger/10 transition-colors shrink-0"
+                            title="Xóa thông báo này"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       ))
                     )}
@@ -271,6 +300,18 @@ export const AdminLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Xác nhận xóa toàn bộ thông báo */}
+      <ConfirmDialog
+        isOpen={confirmClearNotifOpen}
+        title="Xác nhận xóa tất cả thông báo?"
+        description="Bạn có chắc chắn muốn xóa toàn bộ danh sách thông báo hiện tại không?"
+        confirmText="Đồng ý Xóa hết"
+        cancelText="Giữ lại"
+        variant="danger"
+        onConfirm={handleConfirmClearAllNotifs}
+        onCancel={() => setConfirmClearNotifOpen(false)}
+      />
     </div>
   );
 };

@@ -11,6 +11,7 @@ import {
   Save,
   Filter,
   Calendar,
+  Trash2,
 } from 'lucide-react';
 import { useHotelData } from '@/context/HotelDataContext';
 import { Button } from '@/components/ui/Button';
@@ -29,6 +30,7 @@ export const AdminBookingsPage: React.FC = () => {
     settings,
     updateBookingStatus,
     updateBookingAdminNotes,
+    deleteBooking,
   } = useHotelData();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,12 +42,13 @@ export const AdminBookingsPage: React.FC = () => {
   const [internalNotesDraft, setInternalNotesDraft] = useState('');
   const [notesSavedToast, setNotesSavedToast] = useState(false);
 
-  // Confirm Dialog State for every status change
+  // Confirm Dialog State for status changes and deletion
   const [pendingStatusAction, setPendingStatusAction] = useState<{
     booking: Booking;
     newStatus: BookingStatus;
     note: string;
   } | null>(null);
+  const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(null);
 
   const filteredBookings = useMemo(() => {
     return bookings.filter((b) => {
@@ -90,6 +93,15 @@ export const AdminBookingsPage: React.FC = () => {
     setPendingStatusAction(null);
   };
 
+  const handleConfirmDeleteBooking = () => {
+    if (!bookingToDelete) return;
+    deleteBooking(bookingToDelete.id);
+    if (selectedBooking?.id === bookingToDelete.id) {
+      setSelectedBooking(null);
+    }
+    setBookingToDelete(null);
+  };
+
   const handleSaveInternalNotes = () => {
     if (!selectedBooking) return;
     updateBookingAdminNotes(selectedBooking.id, internalNotesDraft);
@@ -101,7 +113,7 @@ export const AdminBookingsPage: React.FC = () => {
     setTimeout(() => setNotesSavedToast(false), 2500);
   };
 
-  // Export filtered bookings to Excel (.xlsx) without prices
+  // Export filtered bookings to Excel (.xlsx)
   const handleExportExcel = () => {
     const rows = filteredBookings.map((b, idx) => ({
       STT: idx + 1,
@@ -113,7 +125,6 @@ export const AdminBookingsPage: React.FC = () => {
       'Ngày Nhận Phòng': formatDateVN(b.check_in_date),
       'Ngày Trả Phòng': formatDateVN(b.check_out_date),
       'Số Đêm': b.nights_count,
-      'Số Khách': b.adults_count,
       'Giờ Nhận Phòng & Ghi Chú': b.customer_notes || '',
       'Trạng Thái': b.status,
       'Ghi Chú Nội Bộ': b.internal_admin_notes || '',
@@ -129,7 +140,7 @@ export const AdminBookingsPage: React.FC = () => {
     );
   };
 
-  // Print formatted booking slip without prices
+  // Print formatted booking slip
   const handlePrintBookingSlip = (bk: Booking) => {
     const printWin = window.open('', '_blank', 'width=820,height=720');
     if (!printWin) {
@@ -144,12 +155,12 @@ export const AdminBookingsPage: React.FC = () => {
         <meta charset="UTF-8" />
         <title>Phiếu Đặt Phòng ${bk.booking_code} - ${settings.hotel_name}</title>
         <style>
-          body { font-family: Arial, sans-serif; color: #30251F; padding: 32px; line-height: 1.6; }
+          body { font-family: Arial, sans-serif; color: #221813; padding: 32px; line-height: 1.6; }
           .header { border-bottom: 2px solid #B69A68; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; }
           h1 { margin: 0; font-size: 22px; text-transform: uppercase; }
           .code-box { background: #F8F5EF; border: 1px solid #B69A68; padding: 12px 18px; font-weight: bold; font-size: 18px; border-radius: 10px; }
           table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-          th, td { border: 1px solid #E0D5C2; padding: 10px 12px; text-align: left; font-size: 14px; }
+          th, td { border: 1px solid #DCD0BA; padding: 10px 12px; text-align: left; font-size: 14px; }
           th { background: #EFE8DA; width: 35%; }
           .footer { margin-top: 40px; display: flex; justify-content: space-between; text-align: center; font-size: 14px; }
         </style>
@@ -158,7 +169,7 @@ export const AdminBookingsPage: React.FC = () => {
         <div class="header">
           <div>
             <h1>${settings.hotel_name}</h1>
-            <div><strong>Hotline lễ tân:</strong> ${settings.phone_primary}</div>
+            <div><strong>Số điện thoại lễ tân:</strong> ${settings.phone_primary}</div>
             <div><strong>Địa chỉ:</strong> ${settings.address_text}</div>
           </div>
           <div class="code-box">
@@ -172,7 +183,6 @@ export const AdminBookingsPage: React.FC = () => {
           <tr><th>Loại phòng muốn đặt</th><td><strong>${bk.room_name} (${bk.room_code})</strong></td></tr>
           <tr><th>Ngày nhận phòng</th><td><strong>${formatDateVN(bk.check_in_date)}</strong></td></tr>
           <tr><th>Ngày trả phòng dự kiến</th><td><strong>${formatDateVN(bk.check_out_date)}</strong> (${bk.nights_count} đêm)</td></tr>
-          <tr><th>Số lượng khách</th><td><strong>${bk.adults_count} người</strong></td></tr>
           <tr><th>Giờ nhận phòng & Ghi chú</th><td><strong>${bk.customer_notes || 'Không có ghi chú'}</strong></td></tr>
         </table>
         <div class="footer">
@@ -207,8 +217,8 @@ export const AdminBookingsPage: React.FC = () => {
           <h2 className="font-serif text-2xl font-extrabold text-text-primary mt-1">
             Danh Sách Khách Đặt Phòng ({filteredBookings.length} đơn)
           </h2>
-          <p className="text-xs sm:text-sm font-medium text-text-secondary mt-1">
-            Bấm trực tiếp vào số điện thoại để <strong>Gọi điện / Nhắn SMS</strong>. Mọi thao tác Xác nhận hoặc Hủy đều có bước hỏi lại an toàn.
+          <p className="text-xs sm:text-sm font-semibold text-text-secondary mt-1">
+            Bấm trực tiếp vào số điện thoại để <strong>Gọi điện / Nhắn SMS</strong>. Mọi thao tác Xác nhận, Hủy hoặc Xóa đơn đều có bước hỏi lại an toàn.
           </p>
         </div>
 
@@ -230,7 +240,7 @@ export const AdminBookingsPage: React.FC = () => {
             placeholder="Tìm theo tên khách, số điện thoại hoặc tên phòng..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-11 pl-9 pr-3.5 rounded-xl bg-bg-ivory border border-border-default text-xs sm:text-sm font-semibold focus:outline-none focus:border-brand-gold"
+            className="w-full h-11 pl-9 pr-3.5 rounded-xl bg-bg-ivory border border-border-default text-xs sm:text-sm font-bold text-text-primary focus:outline-none focus:border-brand-gold"
           />
           <Search className="w-4 h-4 text-text-muted absolute left-3 top-3.5" />
         </div>
@@ -240,7 +250,7 @@ export const AdminBookingsPage: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as 'all' | BookingStatus)}
-            className="w-full h-11 px-3 rounded-xl bg-bg-ivory border border-border-default text-xs sm:text-sm font-bold"
+            className="w-full h-11 px-3 rounded-xl bg-bg-ivory border border-border-default text-xs sm:text-sm font-bold text-text-primary"
           >
             <option value="all">Tất cả trạng thái ({bookings.length})</option>
             <option value="pending">Chờ xác nhận</option>
@@ -256,7 +266,7 @@ export const AdminBookingsPage: React.FC = () => {
             type="date"
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="w-full h-11 px-3 rounded-xl bg-bg-ivory border border-border-default text-xs sm:text-sm font-bold"
+            className="w-full h-11 px-3 rounded-xl bg-bg-ivory border border-border-default text-xs sm:text-sm font-bold text-text-primary"
             title="Lọc theo ngày nhận phòng"
           />
           {dateFilter && (
@@ -276,13 +286,13 @@ export const AdminBookingsPage: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-sm">
             <thead>
-              <tr className="border-b border-border-default text-xs font-extrabold uppercase tracking-wider text-text-secondary bg-bg-ivory">
+              <tr className="border-b border-border-default text-xs font-extrabold uppercase tracking-wider text-text-primary bg-bg-ivory">
                 <th className="py-3.5 px-4">Khách hàng &amp; Gọi / SMS</th>
                 <th className="py-3.5 px-4">Phòng muốn đặt</th>
                 <th className="py-3.5 px-4">Ngày lưu trú</th>
                 <th className="py-3.5 px-4">Giờ nhận phòng &amp; Ghi chú</th>
                 <th className="py-3.5 px-4">Trạng thái</th>
-                <th className="py-3.5 px-4 text-right">Thao tác xác nhận</th>
+                <th className="py-3.5 px-4 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border-default">
@@ -316,10 +326,9 @@ export const AdminBookingsPage: React.FC = () => {
                         {bk.room_name}
                       </div>
                       <div className="text-xs font-bold text-text-secondary mt-0.5">
-                        Mã: <strong>{bk.room_code}</strong> •{' '}
-                        <strong>{bk.adults_count} khách</strong>
+                        Mã phòng: <strong>{bk.room_code}</strong>
                       </div>
-                      <span className="text-[11px] font-semibold text-text-muted block mt-0.5">
+                      <span className="text-[11px] font-bold text-text-muted block mt-0.5">
                         Mã đơn: {bk.booking_code}
                       </span>
                     </td>
@@ -338,11 +347,11 @@ export const AdminBookingsPage: React.FC = () => {
 
                     <td className="py-4 px-4 text-xs max-w-xs">
                       {bk.customer_notes ? (
-                        <div className="p-2.5 rounded-xl bg-brand-champagne/35 border border-brand-gold/30 font-bold text-text-primary">
+                        <div className="p-2.5 rounded-xl bg-brand-champagne/45 border border-brand-gold/40 font-extrabold text-text-primary">
                           {bk.customer_notes}
                         </div>
                       ) : (
-                        <span className="text-text-muted font-medium">
+                        <span className="text-text-muted font-semibold">
                           Nhận phòng giờ tiêu chuẩn (từ 14:00)
                         </span>
                       )}
@@ -391,7 +400,7 @@ export const AdminBookingsPage: React.FC = () => {
                           variant="secondary"
                           size="sm"
                           leftIcon={<Eye className="w-3.5 h-3.5" />}
-                          className="rounded-xl font-bold"
+                          className="rounded-xl font-extrabold"
                           onClick={() => handleOpenDetail(bk)}
                         >
                           Chi tiết
@@ -403,6 +412,14 @@ export const AdminBookingsPage: React.FC = () => {
                           title="In phiếu đặt phòng"
                         >
                           <Printer className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setBookingToDelete(bk)}
+                          className="p-2 rounded-xl border border-border-default bg-bg-ivory hover:border-state-danger text-state-danger transition-colors"
+                          title="Xóa đơn đặt phòng này"
+                        >
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -423,23 +440,34 @@ export const AdminBookingsPage: React.FC = () => {
           subtitle={`Mã đơn: ${selectedBooking.booking_code} • Đăng ký lúc ${formatDateTimeVN(selectedBooking.created_at)}`}
           maxWidthClass="max-w-2xl"
           footer={
-            <>
+            <div className="w-full flex flex-wrap items-center justify-between gap-2">
               <Button
-                variant="secondary"
-                leftIcon={<Printer className="w-4 h-4" />}
-                onClick={() => handlePrintBookingSlip(selectedBooking)}
-                className="rounded-xl font-bold"
-              >
-                In phiếu đặt phòng
-              </Button>
-              <Button
-                variant="primary"
-                onClick={() => setSelectedBooking(null)}
+                variant="danger"
+                size="sm"
+                leftIcon={<Trash2 className="w-4 h-4" />}
+                onClick={() => setBookingToDelete(selectedBooking)}
                 className="rounded-xl font-extrabold"
               >
-                Đóng cửa sổ
+                Xóa đơn này
               </Button>
-            </>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="secondary"
+                  leftIcon={<Printer className="w-4 h-4" />}
+                  onClick={() => handlePrintBookingSlip(selectedBooking)}
+                  className="rounded-xl font-extrabold"
+                >
+                  In phiếu đặt phòng
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => setSelectedBooking(null)}
+                  className="rounded-xl font-extrabold"
+                >
+                  Đóng cửa sổ
+                </Button>
+              </div>
+            </div>
           }
         >
           <div className="space-y-5 text-sm">
@@ -452,7 +480,7 @@ export const AdminBookingsPage: React.FC = () => {
                 <p className="font-serif text-lg font-extrabold text-text-primary">
                   {selectedBooking.guest_name}
                 </p>
-                <p className="font-bold text-brand-gold-dark">
+                <p className="font-extrabold text-brand-gold-dark">
                   SĐT: {selectedBooking.guest_phone}
                 </p>
                 <PhoneActions
@@ -469,13 +497,10 @@ export const AdminBookingsPage: React.FC = () => {
                 <p className="font-serif text-lg font-extrabold text-text-primary">
                   {selectedBooking.room_name} ({selectedBooking.room_code})
                 </p>
-                <p className="text-text-secondary font-semibold">
+                <p className="text-text-secondary font-bold">
                   Nhận: <strong>{formatDateVN(selectedBooking.check_in_date)}</strong> → Trả:{' '}
                   <strong>{formatDateVN(selectedBooking.check_out_date)}</strong> (
                   {selectedBooking.nights_count} đêm)
-                </p>
-                <p className="text-text-secondary font-semibold">
-                  Số khách: <strong>{selectedBooking.adults_count} người</strong>
                 </p>
                 <div className="pt-1">
                   <StatusBadge status={selectedBooking.status} />
@@ -484,9 +509,9 @@ export const AdminBookingsPage: React.FC = () => {
             </div>
 
             {selectedBooking.customer_notes && (
-              <div className="p-4 rounded-2xl bg-brand-champagne/40 border border-brand-gold/40">
+              <div className="p-4 rounded-2xl bg-brand-champagne/45 border border-brand-gold/40">
                 <span className="text-xs font-extrabold uppercase tracking-wider text-bg-wood-deep block mb-1">
-                  Giờ nhận phòng dự kiến &amp; Ghi chú của khách:
+                  Giờ nhận phòng cụ thể &amp; Ghi chú của khách:
                 </span>
                 <p className="font-extrabold text-text-primary">
                   {selectedBooking.customer_notes}
@@ -494,7 +519,7 @@ export const AdminBookingsPage: React.FC = () => {
               </div>
             )}
 
-            {/* Workflow Status Actions (Each opens ConfirmDialog) */}
+            {/* Workflow Status Actions */}
             <div className="p-4 rounded-2xl bg-bg-cream/60 border border-border-default space-y-3">
               <span className="text-xs font-extrabold uppercase tracking-wider text-text-primary block">
                 Cập nhật trạng thái đơn đặt phòng (Có bước xác nhận an toàn)
@@ -576,7 +601,7 @@ export const AdminBookingsPage: React.FC = () => {
                   size="sm"
                   leftIcon={<Save className="w-3.5 h-3.5" />}
                   onClick={handleSaveInternalNotes}
-                  className="rounded-xl font-bold"
+                  className="rounded-xl font-extrabold"
                 >
                   Lưu ghi chú
                 </Button>
@@ -597,9 +622,9 @@ export const AdminBookingsPage: React.FC = () => {
                   >
                     <div>
                       <StatusBadge status={h.new_status} />
-                      <p className="font-semibold text-text-secondary mt-1">{h.note}</p>
+                      <p className="font-bold text-text-secondary mt-1">{h.note}</p>
                     </div>
-                    <span className="text-[11px] font-semibold text-text-muted shrink-0">
+                    <span className="text-[11px] font-bold text-text-muted shrink-0">
                       {formatDateTimeVN(h.created_at)}
                     </span>
                   </div>
@@ -662,6 +687,28 @@ export const AdminBookingsPage: React.FC = () => {
         }
         onConfirm={handleConfirmStatusUpdate}
         onCancel={() => setPendingStatusAction(null)}
+      />
+
+      {/* Confirmation Dialog for Deleting Booking */}
+      <ConfirmDialog
+        isOpen={Boolean(bookingToDelete)}
+        title="Xác nhận XÓA vĩnh viễn đơn đặt phòng này?"
+        description="Đơn đặt phòng sẽ bị xóa khỏi danh sách quản lý. Vui lòng kiểm tra lại thông tin một lần nữa trước khi xóa:"
+        confirmText="Đồng ý Xóa đơn"
+        cancelText="Giữ lại, không xóa"
+        variant="danger"
+        details={
+          bookingToDelete
+            ? [
+                { label: 'Mã đơn', value: bookingToDelete.booking_code },
+                { label: 'Khách hàng', value: bookingToDelete.guest_name },
+                { label: 'Số điện thoại', value: bookingToDelete.guest_phone },
+                { label: 'Loại phòng', value: bookingToDelete.room_name || '' },
+              ]
+            : []
+        }
+        onConfirm={handleConfirmDeleteBooking}
+        onCancel={() => setBookingToDelete(null)}
       />
     </div>
   );

@@ -29,15 +29,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const variantClasses = {
       primary:
-        'bg-brand-gold text-text-on-dark hover:bg-brand-gold-dark border border-brand-gold hover:border-brand-gold-dark shadow-sm',
+        'bg-brand-gold text-white hover:bg-brand-gold-dark border border-brand-gold hover:border-brand-gold-dark shadow-sm',
       secondary:
-        'bg-transparent text-text-primary border border-border-strong hover:bg-bg-beige/40 hover:border-brand-gold-dark',
+        'bg-bg-ivory-white text-text-primary border border-border-strong hover:bg-bg-cream hover:border-brand-gold-dark shadow-2xs',
       outline:
-        'bg-transparent text-text-primary border border-border-strong hover:bg-bg-beige/40 hover:border-brand-gold-dark',
+        'bg-bg-ivory-white text-text-primary border border-border-strong hover:bg-bg-cream hover:border-brand-gold-dark',
       dark:
-        'bg-bg-wood-deep text-text-on-dark hover:bg-bg-wood border border-bg-wood-deep',
+        'bg-bg-wood-deep text-white hover:bg-bg-wood border border-bg-wood-deep',
       overlay:
-        'bg-white/10 text-text-on-dark border border-white/40 hover:bg-white/20 backdrop-blur-sm',
+        'bg-white/15 text-white border border-white/50 hover:bg-white/25 backdrop-blur-sm',
       danger:
         'bg-state-danger text-white hover:opacity-90 border border-state-danger',
       ghost:
@@ -55,7 +55,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         className={cn(
-          'inline-flex items-center justify-center gap-2 font-sans font-semibold tracking-normal rounded-classic transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-gold/40 disabled:opacity-55 disabled:cursor-not-allowed',
+          'inline-flex items-center justify-center gap-2 font-sans font-bold tracking-normal rounded-classic transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-gold/40 disabled:opacity-55 disabled:cursor-not-allowed',
           variantClasses[variant],
           sizeClasses[size],
           fullWidth && 'w-full',

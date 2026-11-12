@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { Menu, X, Phone, CalendarCheck } from 'lucide-react';
+import { Menu, X, CalendarCheck } from 'lucide-react';
 import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
@@ -45,7 +45,7 @@ export const Header: React.FC = () => {
         {/* Center: Refined, Graceful Desktop Navigation */}
         <nav
           aria-label="Điều hướng chính"
-          className="hidden lg:flex items-center gap-1 bg-bg-cream/60 px-2.5 py-1.5 rounded-full border border-border-default/80 shadow-xs"
+          className="hidden lg:flex items-center gap-1.5 bg-bg-cream/70 px-3 py-1.5 rounded-full border border-border-default shadow-xs"
         >
           {NAV_LINKS.map((item) => (
             <NavLink
@@ -54,10 +54,10 @@ export const Header: React.FC = () => {
               end={item.path === '/'}
               className={({ isActive }) =>
                 cn(
-                  'px-5 py-2 rounded-full text-[14px] font-bold transition-all duration-200',
+                  'px-5 py-2 rounded-full text-[14px] font-extrabold transition-all duration-200',
                   isActive
-                    ? 'bg-bg-wood-deep text-brand-gold-light shadow-xs'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-ivory-white/80'
+                    ? 'bg-bg-wood-deep text-white shadow-xs'
+                    : 'text-text-primary hover:bg-bg-ivory-white'
                 )
               }
             >
@@ -66,23 +66,14 @@ export const Header: React.FC = () => {
           ))}
         </nav>
 
-        {/* Right: Call + Book CTA (No Admin switch, No SMS button) */}
+        {/* Right: Clean Book CTA */}
         <div className="hidden sm:flex items-center gap-2.5">
-          <a
-            href="tel:0944861242"
-            className="hidden xl:inline-flex items-center gap-2 bg-bg-cream/60 px-4 py-2 rounded-full border border-border-default/80 text-xs font-extrabold text-text-primary hover:text-brand-gold-dark transition-colors"
-            title="Gọi điện lễ tân"
-          >
-            <Phone className="w-3.5 h-3.5 text-state-success" />
-            0944 861 242
-          </a>
-
           <Link to="/booking">
             <Button
               variant="primary"
               size="md"
               leftIcon={<CalendarCheck className="w-4 h-4" />}
-              className="rounded-full shadow-xs font-extrabold px-5"
+              className="rounded-full shadow-xs font-extrabold px-6"
             >
               Đặt phòng ngay
             </Button>
@@ -112,9 +103,9 @@ export const Header: React.FC = () => {
                 end={item.path === '/'}
                 className={({ isActive }) =>
                   cn(
-                    'py-3 px-4 rounded-xl text-[15px] font-bold transition-colors flex items-center justify-between',
+                    'py-3 px-4 rounded-xl text-[15px] font-extrabold transition-colors flex items-center justify-between',
                     isActive
-                      ? 'bg-bg-wood-deep text-brand-gold-light'
+                      ? 'bg-bg-wood-deep text-white'
                       : 'text-text-primary hover:bg-bg-cream/60'
                   )
                 }
@@ -123,14 +114,7 @@ export const Header: React.FC = () => {
               </NavLink>
             ))}
 
-            <div className="pt-3 mt-2 border-t border-border-default grid grid-cols-2 gap-2.5">
-              <a
-                href="tel:0944861242"
-                className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-state-success/15 text-state-success text-sm font-extrabold border border-state-success/30"
-              >
-                <Phone className="w-4 h-4" />
-                Gọi: 0944 861 242
-              </a>
+            <div className="pt-3 mt-2 border-t border-border-default">
               <Link to="/booking">
                 <Button variant="primary" fullWidth className="rounded-xl font-extrabold">
                   Đặt phòng ngay

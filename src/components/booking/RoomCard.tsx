@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BedDouble, Users, ArrowRight, Wifi, Wind, Tv, Bath, Phone } from 'lucide-react';
+import { BedDouble, Users, ArrowRight, Wifi, Wind, Tv, Bath } from 'lucide-react';
 import type { Room } from '@/types';
 import { Button } from '@/components/ui/Button';
 
@@ -21,7 +21,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, layout = 'grid' }) => 
   if (layout === 'list') {
     return (
       <article className="bg-bg-ivory-white border border-border-default rounded-2xl overflow-hidden shadow-luxury hover:border-border-strong transition-all flex flex-col md:flex-row">
-        <div className="relative md:w-[360px] lg:w-[400px] shrink-0 overflow-hidden bg-bg-cream aspect-[4/3] md:aspect-auto">
+        <div className="relative md:w-[340px] lg:w-[380px] shrink-0 overflow-hidden bg-bg-cream aspect-[4/3] md:aspect-auto">
           <img
             src={primaryImage}
             alt={primaryAlt}
@@ -35,7 +35,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, layout = 'grid' }) => 
               {room.room_type_label}
             </span>
           </div>
-          <div className="absolute bottom-3 left-3 bg-bg-ivory-white/95 text-text-primary text-xs font-extrabold px-3 py-1 rounded-xl">
+          <div className="absolute bottom-3 left-3 bg-bg-ivory-white/95 text-text-primary text-xs font-extrabold px-3 py-1 rounded-xl shadow-xs">
             Mã phòng: {room.room_code}
           </div>
         </div>
@@ -55,55 +55,46 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, layout = 'grid' }) => 
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-brand-gold-dark" />
-                Dành cho {room.max_adults} người
+                Phù hợp {room.bed_count} người
               </span>
             </div>
 
-            <p className="text-sm font-medium text-text-secondary mt-3 leading-relaxed line-clamp-2">
+            <p className="text-sm font-semibold text-text-secondary mt-3 leading-relaxed line-clamp-2">
               {room.short_description}
             </p>
 
-            <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-border-default/70 text-xs font-bold text-text-secondary">
-              <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-bg-ivory rounded-xl border border-border-default">
+            <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-border-default/70 text-xs font-extrabold text-text-primary">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg-ivory rounded-xl border border-border-default">
                 <Wifi className="w-3.5 h-3.5 text-brand-gold-dark" /> Wi-Fi miễn phí
               </span>
-              <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-bg-ivory rounded-xl border border-border-default">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg-ivory rounded-xl border border-border-default">
                 <Wind className="w-3.5 h-3.5 text-brand-gold-dark" /> Điều hòa
               </span>
-              <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-bg-ivory rounded-xl border border-border-default">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg-ivory rounded-xl border border-border-default">
                 <Tv className="w-3.5 h-3.5 text-brand-gold-dark" /> Tivi
               </span>
-              <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-bg-ivory rounded-xl border border-border-default">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg-ivory rounded-xl border border-border-default">
                 <Bath className="w-3.5 h-3.5 text-brand-gold-dark" /> Phòng tắm riêng
               </span>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-border-default">
-            <a
-              href="tel:0944861242"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-state-success/15 text-state-success text-xs font-extrabold border border-state-success/30 hover:bg-state-success hover:text-white transition-colors"
-            >
-              <Phone className="w-3.5 h-3.5" /> Gọi hỏi phòng: 0944 861 242
-            </a>
-
-            <div className="flex items-center gap-2.5">
-              <Link to={`/rooms/${room.slug}`}>
-                <Button variant="secondary" size="sm" className="rounded-xl font-extrabold">
-                  Xem chi tiết
-                </Button>
-              </Link>
-              <Link to={`/booking?room=${room.slug}`}>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
-                  className="rounded-xl font-extrabold"
-                >
-                  Đặt phòng này
-                </Button>
-              </Link>
-            </div>
+          <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-border-default">
+            <Link to={`/rooms/${room.slug}`}>
+              <Button variant="secondary" size="md" className="rounded-xl font-extrabold">
+                Xem chi tiết
+              </Button>
+            </Link>
+            <Link to={`/booking?room=${room.slug}`}>
+              <Button
+                variant="primary"
+                size="md"
+                rightIcon={<ArrowRight className="w-4 h-4" />}
+                className="rounded-xl font-extrabold"
+              >
+                Đặt phòng này
+              </Button>
+            </Link>
           </div>
         </div>
       </article>
@@ -126,7 +117,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, layout = 'grid' }) => 
             {room.room_type_label}
           </span>
         </div>
-        <div className="absolute bottom-3 left-3 bg-bg-ivory-white/95 text-text-primary text-xs font-extrabold px-3 py-1 rounded-xl">
+        <div className="absolute bottom-3 left-3 bg-bg-ivory-white/95 text-text-primary text-xs font-extrabold px-3 py-1 rounded-xl shadow-xs">
           Mã phòng: {room.room_code}
         </div>
       </div>
@@ -139,29 +130,29 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, layout = 'grid' }) => 
             </h3>
           </Link>
 
-          <div className="flex flex-wrap items-center gap-2.5 mt-3 text-xs font-extrabold text-text-secondary">
+          <div className="flex flex-wrap items-center gap-2.5 mt-3 text-xs font-extrabold text-text-primary">
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-bg-ivory border border-border-default">
               <BedDouble className="w-3.5 h-3.5 text-brand-gold-dark" />
               {room.bed_count} giường ngủ
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-bg-ivory border border-border-default">
               <Users className="w-3.5 h-3.5 text-brand-gold-dark" />
-              Dành cho {room.max_adults} người
+              Phù hợp {room.bed_count} người
             </span>
           </div>
 
-          <p className="text-sm font-medium text-text-secondary mt-3 leading-relaxed line-clamp-2">
+          <p className="text-sm font-semibold text-text-secondary mt-3 leading-relaxed line-clamp-2">
             {room.short_description}
           </p>
         </div>
 
-        <div className="pt-4 border-t border-border-default flex items-center justify-between gap-2.5">
-          <Link to={`/rooms/${room.slug}`} className="flex-1">
+        <div className="pt-4 border-t border-border-default grid grid-cols-2 gap-2.5">
+          <Link to={`/rooms/${room.slug}`}>
             <Button variant="secondary" size="sm" fullWidth className="rounded-xl font-extrabold">
               Chi tiết phòng
             </Button>
           </Link>
-          <Link to={`/booking?room=${room.slug}`} className="flex-1">
+          <Link to={`/booking?room=${room.slug}`}>
             <Button
               variant="primary"
               size="sm"
