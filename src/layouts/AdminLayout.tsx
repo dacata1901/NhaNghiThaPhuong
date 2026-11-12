@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, Outlet, Link, Navigate, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, Navigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   BedDouble,
@@ -13,7 +13,6 @@ import {
   CheckCheck,
   Volume2,
   VolumeX,
-  ArrowLeftRight,
   Phone,
 } from 'lucide-react';
 import { useAdminAuth } from '@/context/AdminAuthContext';
@@ -79,10 +78,10 @@ export const AdminLayout: React.FC = () => {
           <div className="px-6 py-6 border-b border-white/10 flex items-center justify-between">
             <div>
               <span className="font-serif text-lg font-extrabold tracking-[0.12em] uppercase text-brand-gold-light block">
-                THA PHƯƠNG ADMIN
+                QUẢN TRỊ THA PHƯƠNG
               </span>
               <span className="text-xs font-semibold text-text-on-dark/70">
-                Quản lý đơn giản &amp; nhanh chóng
+                Hệ thống quản lý chủ nhà
               </span>
             </div>
             <button
@@ -92,19 +91,6 @@ export const AdminLayout: React.FC = () => {
             >
               <X className="w-5 h-5" />
             </button>
-          </div>
-
-          {/* Nút chuyển nhanh qua lại Admin <-> User */}
-          <div className="px-4 pt-4">
-            <Link
-              to="/"
-              className="flex items-center justify-between px-4 py-3 rounded-2xl bg-brand-gold/20 border border-brand-gold/40 text-brand-gold-light font-extrabold text-xs hover:bg-brand-gold hover:text-text-on-dark transition-all shadow-sm"
-            >
-              <span className="flex items-center gap-2">
-                <ArrowLeftRight className="w-4 h-4" />
-                Chuyển qua Giao diện Khách
-              </span>
-            </Link>
           </div>
 
           <nav className="p-4 space-y-1.5">
@@ -185,23 +171,13 @@ export const AdminLayout: React.FC = () => {
               </h1>
               <p className="text-xs font-semibold text-text-secondary hidden sm:flex items-center gap-2">
                 <Phone className="w-3.5 h-3.5 text-brand-gold-dark" />
-                Hotline: <strong>{settings.phone_primary}</strong> • Email:{' '}
+                Số điện thoại: <strong>{settings.phone_primary}</strong> • Email:{' '}
                 <strong>{settings.email_notification}</strong>
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2.5 relative">
-            {/* Nút chuyển nhanh Admin <-> User trên thanh Header */}
-            <Link
-              to="/"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-bg-wood-deep text-brand-gold-light hover:bg-brand-gold hover:text-text-on-dark text-xs font-extrabold transition-colors shadow-sm"
-              title="Chuyển ngay sang trang Khách hàng (User)"
-            >
-              <ArrowLeftRight className="w-3.5 h-3.5" />
-              <span>Giao diện Khách (User)</span>
-            </Link>
-
             <button
               type="button"
               onClick={toggleSoundAlerts}

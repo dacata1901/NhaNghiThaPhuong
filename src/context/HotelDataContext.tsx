@@ -169,9 +169,38 @@ interface HotelDataContextValue {
 
 const HotelDataContext = createContext<HotelDataContextValue | undefined>(undefined);
 
+function normalizeRoomsList(rawRooms: Room[]): Room[] {
+  const cleaned = rawRooms.map((r) => {
+    const cleanName = r.name
+      .replace(/\s*\(Standard Single\)/gi, ' (1–2 Người)')
+      .replace(/\s*\(Deluxe Twin\)/gi, ' (2–4 Người)')
+      .replace(/\s*\(Family Suite\)/gi, ' (3 Giường)');
+    const cleanFullDesc = (r.full_description || '')
+      .replace(/\s*\(Standard Single\)/gi, '')
+      .replace(/\s*\(Deluxe Twin\)/gi, '')
+      .replace(/\s*\(Family Suite\)/gi, '');
+    return {
+      ...r,
+      name: cleanName,
+      full_description: cleanFullDesc,
+    };
+  });
+
+  // Đảm bảo luôn có đủ Phòng 3 Người (room-3-beds) nếu dữ liệu cũ từ Supabase/LocalStorage chỉ có 2 phòng
+  const hasThreePersonRoom = cleaned.some(
+    (r) => r.id === 'room-3-beds' || r.room_type === '3_beds'
+  );
+  const seedThreeRoom = INITIAL_ROOMS.find((r) => r.id === 'room-3-beds');
+  if (!hasThreePersonRoom && seedThreeRoom) {
+    cleaned.push(seedThreeRoom);
+  }
+
+  return cleaned;
+}
+
 export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [rooms, setRooms] = useState<Room[]>(() =>
-    loadFromStorage(STORAGE_KEYS.ROOMS, INITIAL_ROOMS)
+    normalizeRoomsList(loadFromStorage(STORAGE_KEYS.ROOMS, INITIAL_ROOMS))
   );
   const [bookings, setBookings] = useState<Booking[]>(() =>
     loadFromStorage(STORAGE_KEYS.BOOKINGS, INITIAL_BOOKINGS)
@@ -296,7 +325,9 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const loadRemoteData = () => {
       fetchInitialSupabaseData().then((remote) => {
         if (!remote) return;
-        if (remote.rooms && remote.rooms.length > 0) setRooms(remote.rooms);
+        if (remote.rooms && remote.rooms.length > 0) {
+          setRooms(normalizeRoomsList(remote.rooms));
+        }
         if (remote.settings) setSettings(remote.settings);
         if (remote.pageSeoList && remote.pageSeoList.length > 0) {
           setPageSeoList(remote.pageSeoList);

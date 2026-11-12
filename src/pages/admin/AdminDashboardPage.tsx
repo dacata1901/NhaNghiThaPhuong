@@ -8,7 +8,6 @@ import {
   Plus,
   Check,
   XCircle,
-  ArrowLeftRight,
 } from 'lucide-react';
 import { useHotelData } from '@/context/HotelDataContext';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -66,16 +65,6 @@ export const AdminDashboardPage: React.FC = () => {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
-          <Link to="/">
-            <Button
-              variant="secondary"
-              size="sm"
-              leftIcon={<ArrowLeftRight className="w-3.5 h-3.5" />}
-              className="rounded-xl font-extrabold"
-            >
-              Xem Giao Diện Khách
-            </Button>
-          </Link>
           <Link to="/admin/rooms">
             <Button
               variant="secondary"

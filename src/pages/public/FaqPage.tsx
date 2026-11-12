@@ -33,7 +33,7 @@ export const FaqPage: React.FC = () => {
       />
 
       <PageBanner
-        eyebrow="FREQUENTLY ASKED QUESTIONS • GIẢI ĐÁP THẮC MẮC"
+        eyebrow="GIẢI ĐÁP THẮC MẮC KHÁCH HÀNG"
         title="Câu Hỏi Thường Gặp"
         subtitle="Tổng hợp những câu hỏi phổ biến nhất từ khách hàng khi đặt phòng và lưu trú tại Nhà Nghỉ Tha Phương."
         breadcrumbs={[{ label: 'Câu hỏi thường gặp' }]}

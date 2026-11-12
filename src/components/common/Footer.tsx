@@ -6,8 +6,6 @@ import {
   MapPin,
   Clock,
   ShieldCheck,
-  MessageSquare,
-  Shield,
 } from 'lucide-react';
 import { Logo } from '@/components/ui/Logo';
 import { useHotelData } from '@/context/HotelDataContext';
@@ -75,7 +73,7 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2.5 text-sm font-semibold text-text-on-dark/85">
               <li>
                 <Link to="/faq" className="hover:text-brand-gold-light transition-colors">
-                  Câu hỏi thường gặp (FAQ)
+                  Câu hỏi thường gặp
                 </Link>
               </li>
               <li>
@@ -96,7 +94,7 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Column 4: Contact Info with Call + SMS */}
+          {/* Column 4: Contact Info */}
           <div>
             <h3 className="text-base font-extrabold text-brand-gold-light mb-4">
               Liên hệ nhanh 24/7
@@ -106,22 +104,13 @@ export const Footer: React.FC = () => {
                 <span className="block text-xs font-bold text-text-on-dark/70">
                   Số điện thoại Lễ tân ({settings.phone_primary}):
                 </span>
-                <div className="flex flex-wrap items-center gap-2">
-                  <a
-                    href={`tel:${cleanPhone}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-gold text-text-on-dark font-extrabold text-xs hover:bg-brand-gold-light transition-colors"
-                  >
-                    <Phone className="w-3.5 h-3.5" />
-                    Gọi: {settings.phone_primary}
-                  </a>
-                  <a
-                    href={`sms:${cleanPhone}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-brand-gold/40 text-brand-gold-light font-extrabold text-xs hover:bg-white/20 transition-colors"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    Nhắn SMS
-                  </a>
-                </div>
+                <a
+                  href={`tel:${cleanPhone}`}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-brand-gold text-text-on-dark font-extrabold text-xs hover:bg-brand-gold-light transition-colors"
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  Gọi ngay: {settings.phone_primary}
+                </a>
               </li>
               <li className="flex items-start gap-2.5">
                 <Mail className="w-4 h-4 text-brand-gold shrink-0 mt-1" />
@@ -156,16 +145,7 @@ export const Footer: React.FC = () => {
 
         <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold text-text-on-dark/65">
           <p>© {currentYear} {settings.hotel_name}. Bảo lưu mọi quyền.</p>
-          <div className="flex items-center gap-4">
-            <span>Đặt phòng trực tuyến 24/7</span>
-            <Link
-              to="/admin"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-brand-gold-light font-bold transition-colors"
-            >
-              <Shield className="w-3.5 h-3.5" />
-              Chuyển sang Admin
-            </Link>
-          </div>
+          <span>Đặt phòng trực tuyến 24/7 · Phục vụ chu đáo</span>
         </div>
       </div>
     </footer>

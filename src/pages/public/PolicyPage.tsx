@@ -29,10 +29,10 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({ policyType }) => {
     }
   > = {
     'booking-policy': {
-      eyebrow: 'RESERVATION POLICY • QUY ĐỊNH ĐẶT PHÒNG',
+      eyebrow: 'QUY ĐỊNH ĐẶT PHÒNG & LƯU TRÚ',
       title: 'Chính Sách Đặt Phòng & Lưu Trú',
       description:
-        'Quy định rõ ràng về thủ tục đặt giữ phòng trực tuyến, giờ nhận/trả phòng và phương thức thanh toán tại Nhà Nghỉ Tha Phương.',
+        'Quy định rõ ràng về thủ tục đặt giữ phòng trực tuyến và giờ nhận/trả phòng tại Nhà Nghỉ Tha Phương.',
       canonicalPath: '/booking-policy',
       sections: [
         {
@@ -44,15 +44,7 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({ policyType }) => {
           ],
         },
         {
-          heading: '2. Phương thức thanh toán trực tiếp tại lễ tân',
-          items: [
-            'Khi đặt phòng trên website, hệ thống sẽ tạo Mã đặt phòng (Booking Code) để giữ phòng cho quý khách.',
-            'Quý khách thanh toán 100% tiền phòng trực tiếp tại quầy lễ tân khi làm thủ tục nhận phòng (bằng tiền mặt hoặc chuyển khoản ngân hàng).',
-            'Giá phòng hiển thị tại thời điểm đặt được lưu cố định trong đơn đặt phòng của quý khách.',
-          ],
-        },
-        {
-          heading: '3. Thủ tục nhận phòng & Nội quy lưu trú',
+          heading: '2. Thủ tục nhận phòng & Nội quy lưu trú',
           items: [
             'Quý khách vui lòng xuất trình CCCD/CMND hoặc Hộ chiếu hợp lệ tại quầy lễ tân để đăng ký lưu trú theo quy định.',
             'Giữ gìn vệ sinh chung, không gây ồn ào sau 22:00 và tuyệt đối không mang các chất cấm, chất dễ cháy nổ vào khu vực nhà nghỉ.',
@@ -61,30 +53,28 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({ policyType }) => {
       ],
     },
     'cancellation-policy': {
-      eyebrow: 'CANCELLATION POLICY • QUY ĐỊNH HỦY PHÒNG',
+      eyebrow: 'QUY ĐỊNH HỦY PHÒNG & ĐỔI LỊCH',
       title: 'Chính Sách Hủy Đặt Phòng & Đổi Lịch',
       description:
-        'Hướng dẫn hủy hoặc thay đổi ngày lưu trú thuận tiện, minh bạch cho khách hàng đặt phòng tại Nhà Nghỉ Tha Phương.',
+        'Hướng dẫn hủy hoặc thay đổi ngày lưu trú thuận tiện cho khách hàng đặt phòng tại Nhà Nghỉ Tha Phương.',
       canonicalPath: '/cancellation-policy',
       sections: [
         {
           heading: '1. Điều kiện hủy hoặc thay đổi đặt phòng',
           items: [
-            'Quý khách được miễn phí hủy hoặc đổi ngày lưu trú khi thông báo trước giờ nhận phòng tối thiểu 24 giờ.',
-            'Quý khách có thể tự gửi yêu cầu hủy trên trang Tra cứu đặt phòng (bằng Mã đặt phòng + Số điện thoại/Email) hoặc gọi trực tiếp hotline 0944 861 242.',
+            'Quý khách được miễn phí hủy hoặc đổi ngày lưu trú khi thông báo trước giờ nhận phòng qua số điện thoại lễ tân 0944 861 242.',
           ],
         },
         {
           heading: '2. Quy định giữ phòng ngày nhận phòng',
           items: [
-            'Trong trường hợp quý khách đến muộn hơn 18:00 ngày nhận phòng, vui lòng liên hệ trước với lễ tân để chúng tôi tiếp tục giữ phòng cho quý khách.',
-            'Nếu quá thời gian quy định mà lễ tân không thể liên lạc được qua số điện thoại đăng ký, đơn đặt phòng có thể được chuyển sang trạng thái hủy để nhường phòng cho khách khác.',
+            'Trong trường hợp quý khách đến muộn hơn giờ đã hẹn, vui lòng liên hệ trước với lễ tân để chúng tôi tiếp tục giữ phòng cho quý khách.',
           ],
         },
       ],
     },
     'privacy-policy': {
-      eyebrow: 'PRIVACY POLICY • BẢO MẬT THÔNG TIN',
+      eyebrow: 'BẢO MẬT THÔNG TIN KHÁCH HÀNG',
       title: 'Chính Sách Bảo Mật Thông Tin Khách Hàng',
       description:
         'Cam kết bảo vệ quyền riêng tư và dữ liệu cá nhân của khách hàng khi đặt phòng trực tuyến tại Nhà Nghỉ Tha Phương.',
@@ -93,21 +83,20 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({ policyType }) => {
         {
           heading: '1. Thông tin chúng tôi thu thập',
           items: [
-            'Họ và tên, Số điện thoại, Địa chỉ Email và Ghi chú đặt phòng khi quý khách thực hiện đặt phòng hoặc gửi biểu mẫu liên hệ.',
-            'Thông tin này chỉ phục vụ duy nhất cho việc xác nhận đặt phòng, gửi mã đặt phòng qua email và liên hệ hỗ trợ lưu trú.',
+            'Họ và tên, Số điện thoại và Ghi chú giờ nhận phòng khi quý khách thực hiện đặt phòng hoặc gửi lời nhắn liên hệ.',
+            'Thông tin này chỉ phục vụ duy nhất cho việc xác nhận đặt phòng và liên hệ hỗ trợ lưu trú.',
           ],
         },
         {
-          heading: '2. Bảo mật tra cứu & lưu trữ dữ liệu',
+          heading: '2. Cam kết bảo mật dữ liệu',
           items: [
-            'Hệ thống tra cứu đặt phòng yêu cầu xác thực đồng thời Mã đặt phòng và Số điện thoại/Email để ngăn chặn người lạ tra cứu trái phép.',
             'Nhà Nghỉ Tha Phương cam kết tuyệt đối không chia sẻ, mua bán hoặc tiết lộ thông tin khách hàng cho bất kỳ bên thứ ba nào.',
           ],
         },
       ],
     },
     terms: {
-      eyebrow: 'TERMS OF SERVICE • ĐIỀU KHOẢN SỬ DỤNG',
+      eyebrow: 'ĐIỀU KHOẢN SỬ DỤNG TRANG WEB',
       title: 'Điều Khoản Sử Dụng Website',
       description:
         'Các điều khoản và quy định áp dụng khi khách hàng truy cập, tra cứu và đặt phòng trên hệ thống website Nhà Nghỉ Tha Phương.',

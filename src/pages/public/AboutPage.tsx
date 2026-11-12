@@ -33,7 +33,7 @@ export const AboutPage: React.FC = () => {
       />
 
       <PageBanner
-        eyebrow="OUR STORY • CÂU CHUYỆN THƯƠNG HIỆU"
+        eyebrow="GIỚI THIỆU NHÀ NGHỈ THA PHƯƠNG"
         title="Giới Thiệu Nhà Nghỉ Tha Phương"
         subtitle="Không gian lưu trú ấm cúng, sạch sẽ và riêng tư dành cho khách công tác, du lịch và gia đình."
         breadcrumbs={[{ label: 'Giới thiệu' }]}

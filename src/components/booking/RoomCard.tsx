@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BedDouble, Users, ArrowRight, Wifi, Wind, Tv, Bath, Phone, MessageSquare } from 'lucide-react';
+import { BedDouble, Users, ArrowRight, Wifi, Wind, Tv, Bath, Phone } from 'lucide-react';
 import type { Room } from '@/types';
 import { Button } from '@/components/ui/Button';
 
@@ -31,11 +31,11 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, layout = 'grid' }) => 
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
           />
           <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-            <span className="bg-bg-wood-deep/90 text-brand-gold-light text-xs font-bold px-3.5 py-1.5 rounded-xl backdrop-blur-xs">
+            <span className="bg-bg-wood-deep/90 text-brand-gold-light text-xs font-extrabold px-3.5 py-1.5 rounded-xl backdrop-blur-xs">
               {room.room_type_label}
             </span>
           </div>
-          <div className="absolute bottom-3 left-3 bg-bg-ivory-white/95 text-text-primary text-xs font-bold px-3 py-1 rounded-xl">
+          <div className="absolute bottom-3 left-3 bg-bg-ivory-white/95 text-text-primary text-xs font-extrabold px-3 py-1 rounded-xl">
             Mã phòng: {room.room_code}
           </div>
         </div>
@@ -48,22 +48,22 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, layout = 'grid' }) => 
               </h3>
             </Link>
 
-            <div className="flex flex-wrap items-center gap-4 mt-3 text-sm font-bold text-text-secondary">
+            <div className="flex flex-wrap items-center gap-4 mt-3 text-sm font-extrabold text-text-secondary">
               <span className="inline-flex items-center gap-1.5">
                 <BedDouble className="w-4 h-4 text-brand-gold-dark" />
-                {room.bed_count} giường đôi lớn
+                {room.bed_count} giường ngủ
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-brand-gold-dark" />
-                Tối đa {room.max_adults} người lớn
+                Dành cho {room.max_adults} người
               </span>
             </div>
 
-            <p className="text-sm text-text-secondary mt-3 leading-relaxed line-clamp-2">
+            <p className="text-sm font-medium text-text-secondary mt-3 leading-relaxed line-clamp-2">
               {room.short_description}
             </p>
 
-            <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-border-default/70 text-xs font-semibold text-text-secondary">
+            <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-border-default/70 text-xs font-bold text-text-secondary">
               <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-bg-ivory rounded-xl border border-border-default">
                 <Wifi className="w-3.5 h-3.5 text-brand-gold-dark" /> Wi-Fi miễn phí
               </span>
@@ -80,24 +80,16 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, layout = 'grid' }) => 
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-border-default">
-            <div className="flex items-center gap-2">
-              <a
-                href="tel:0944861242"
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-state-success/15 text-state-success text-xs font-extrabold border border-state-success/30 hover:bg-state-success hover:text-white transition-colors"
-              >
-                <Phone className="w-3.5 h-3.5" /> Gọi hỏi phòng
-              </a>
-              <a
-                href={`sms:0944861242?body=${encodeURIComponent(`Xin chao Nha Nghi Tha Phuong, toi muon dat ${room.name}`)}`}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand-gold/15 text-brand-gold-dark text-xs font-extrabold border border-brand-gold/30 hover:bg-brand-gold hover:text-white transition-colors"
-              >
-                <MessageSquare className="w-3.5 h-3.5" /> Nhắn SMS
-              </a>
-            </div>
+            <a
+              href="tel:0944861242"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-state-success/15 text-state-success text-xs font-extrabold border border-state-success/30 hover:bg-state-success hover:text-white transition-colors"
+            >
+              <Phone className="w-3.5 h-3.5" /> Gọi hỏi phòng: 0944 861 242
+            </a>
 
             <div className="flex items-center gap-2.5">
               <Link to={`/rooms/${room.slug}`}>
-                <Button variant="secondary" size="sm" className="rounded-xl font-bold">
+                <Button variant="secondary" size="sm" className="rounded-xl font-extrabold">
                   Xem chi tiết
                 </Button>
               </Link>
@@ -106,7 +98,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, layout = 'grid' }) => 
                   variant="primary"
                   size="sm"
                   rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
-                  className="rounded-xl font-bold"
+                  className="rounded-xl font-extrabold"
                 >
                   Đặt phòng này
                 </Button>
@@ -130,11 +122,11 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, layout = 'grid' }) => 
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute top-3 left-3 flex items-center gap-2">
-          <span className="bg-bg-wood-deep/90 text-brand-gold-light text-xs font-bold px-3.5 py-1.5 rounded-xl">
+          <span className="bg-bg-wood-deep/90 text-brand-gold-light text-xs font-extrabold px-3.5 py-1.5 rounded-xl">
             {room.room_type_label}
           </span>
         </div>
-        <div className="absolute bottom-3 left-3 bg-bg-ivory-white/95 text-text-primary text-xs font-bold px-3 py-1 rounded-xl">
+        <div className="absolute bottom-3 left-3 bg-bg-ivory-white/95 text-text-primary text-xs font-extrabold px-3 py-1 rounded-xl">
           Mã phòng: {room.room_code}
         </div>
       </div>
@@ -142,30 +134,30 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, layout = 'grid' }) => 
       <div className="p-6 flex-1 flex flex-col justify-between gap-5">
         <div>
           <Link to={`/rooms/${room.slug}`}>
-            <h3 className="text-xl font-extrabold text-text-primary hover:text-brand-gold-dark transition-colors line-clamp-1">
+            <h3 className="text-xl font-extrabold text-text-primary hover:text-brand-gold-dark transition-colors">
               {room.name}
             </h3>
           </Link>
 
-          <div className="flex flex-wrap items-center gap-3 mt-2.5 text-xs font-bold text-text-secondary">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-bg-ivory border border-border-default">
+          <div className="flex flex-wrap items-center gap-2.5 mt-3 text-xs font-extrabold text-text-secondary">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-bg-ivory border border-border-default">
               <BedDouble className="w-3.5 h-3.5 text-brand-gold-dark" />
-              {room.bed_count} giường đôi
+              {room.bed_count} giường ngủ
             </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-bg-ivory border border-border-default">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-bg-ivory border border-border-default">
               <Users className="w-3.5 h-3.5 text-brand-gold-dark" />
-              Tối đa {room.max_adults} người
+              Dành cho {room.max_adults} người
             </span>
           </div>
 
-          <p className="text-sm text-text-secondary mt-3 leading-relaxed line-clamp-2">
+          <p className="text-sm font-medium text-text-secondary mt-3 leading-relaxed line-clamp-2">
             {room.short_description}
           </p>
         </div>
 
-        <div className="pt-4 border-t border-border-default flex items-center justify-between gap-2">
+        <div className="pt-4 border-t border-border-default flex items-center justify-between gap-2.5">
           <Link to={`/rooms/${room.slug}`} className="flex-1">
-            <Button variant="secondary" size="sm" fullWidth className="rounded-xl font-bold">
+            <Button variant="secondary" size="sm" fullWidth className="rounded-xl font-extrabold">
               Chi tiết phòng
             </Button>
           </Link>
@@ -175,7 +167,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, layout = 'grid' }) => 
               size="sm"
               fullWidth
               rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
-              className="rounded-xl font-bold"
+              className="rounded-xl font-extrabold"
             >
               Đặt phòng ngay
             </Button>

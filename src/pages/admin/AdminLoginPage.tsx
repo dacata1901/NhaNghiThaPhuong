@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Lock,
   Mail,
   ShieldCheck,
-  ArrowLeft,
-  Zap,
   AlertCircle,
 } from 'lucide-react';
 import { useAdminAuth } from '@/context/AdminAuthContext';
@@ -18,8 +16,8 @@ export const AdminLoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [email, setEmail] = useState('minhkhang19012006@gmail.com');
-  const [password, setPassword] = useState('ThaPhuong@2026');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -48,16 +46,6 @@ export const AdminLoginPage: React.FC = () => {
     navigate(fromPath, { replace: true });
   };
 
-  const handleInstantLogin = async () => {
-    setError(null);
-    setIsLoading(true);
-    const res = await login('huynhduykhanh0406@gmail.com', 'ThaPhuong@2026');
-    setIsLoading(false);
-    if (res.success) {
-      navigate(fromPath, { replace: true });
-    }
-  };
-
   return (
     <div className="min-h-screen bg-bg-wood-deep flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       <SEOHead
@@ -73,29 +61,17 @@ export const AdminLoginPage: React.FC = () => {
             TP
           </div>
           <span className="text-xs font-extrabold uppercase tracking-[0.2em] text-brand-gold-light block">
-            HỆ THỐNG QUẢN LÝ CHỦ NHÀ
+            HỆ THỐNG QUẢN LÝ NỘI BỘ
           </span>
           <h1 className="font-serif text-3xl font-extrabold text-text-on-dark mt-1">
             Quản Trị Nhà Nghỉ Tha Phương
           </h1>
+          <p className="text-xs font-medium text-text-on-dark/70 mt-1.5">
+            Khu vực dành riêng cho Chủ nhà — Vui lòng đăng nhập để tiếp tục
+          </p>
         </div>
 
         <div className="bg-bg-ivory-white border border-border-strong rounded-3xl p-6 sm:p-8 shadow-luxury-lg text-text-primary space-y-5">
-          {/* Nút vào nhanh 1 chạm cho Chủ nhà */}
-          <div className="p-4 rounded-2xl bg-brand-champagne/40 border border-brand-gold/40 space-y-2.5">
-            <span className="text-xs font-extrabold text-bg-wood-deep block">
-              Chuyển nhanh dành cho Chủ Nhà:
-            </span>
-            <button
-              type="button"
-              onClick={handleInstantLogin}
-              className="w-full py-3 px-4 rounded-xl bg-bg-wood-deep text-brand-gold-light hover:bg-brand-gold hover:text-text-on-dark font-extrabold text-sm flex items-center justify-center gap-2 transition-all shadow-sm"
-            >
-              <Zap className="w-4 h-4" />
-              Vào Ngay Trang Quản Trị (1 Chạm)
-            </button>
-          </div>
-
           {error && (
             <div className="p-3.5 rounded-xl bg-state-danger/10 border border-state-danger/30 text-state-danger text-xs font-bold flex items-start gap-2.5">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
@@ -108,6 +84,7 @@ export const AdminLoginPage: React.FC = () => {
               label="Email Quản trị viên"
               type="email"
               required
+              placeholder="Nhập email quản trị..."
               leftIcon={<Mail className="w-4 h-4" />}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -117,6 +94,7 @@ export const AdminLoginPage: React.FC = () => {
               label="Mật khẩu bảo mật"
               type="password"
               required
+              placeholder="Nhập mật khẩu..."
               leftIcon={<Lock className="w-4 h-4" />}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -134,18 +112,9 @@ export const AdminLoginPage: React.FC = () => {
             </Button>
           </form>
 
-          <div className="pt-4 border-t border-border-default flex items-center justify-between text-xs font-bold text-text-secondary">
-            <Link
-              to="/"
-              className="inline-flex items-center gap-1.5 hover:text-brand-gold-dark font-extrabold"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Chuyển về Giao diện Khách (User)
-            </Link>
-            <span className="inline-flex items-center gap-1 text-state-success font-extrabold">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Bảo mật
-            </span>
+          <div className="pt-4 border-t border-border-default flex items-center justify-center text-xs font-extrabold text-state-success gap-1.5">
+            <ShieldCheck className="w-4 h-4" />
+            <span>Hệ thống bảo mật 2 lớp</span>
           </div>
         </div>
       </div>

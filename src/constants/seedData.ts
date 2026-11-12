@@ -80,10 +80,10 @@ export const INITIAL_ROOMS: Room[] = [
   {
     id: 'room-1-bed',
     room_code: 'TP-101',
-    name: 'Phòng Đơn 1 Giường Đôi (Standard Single)',
+    name: 'Phòng Đơn 1 Giường Đôi (1–2 Người)',
     slug: 'phong-1-giuong-doi-standard',
     room_type: '1_bed',
-    room_type_label: 'Phòng 1 giường',
+    room_type_label: 'Phòng 1–2 người',
     bed_count: 1,
     max_adults: 2,
     max_children: 1,
@@ -91,11 +91,11 @@ export const INITIAL_ROOMS: Room[] = [
     price_per_night: 300000,
     total_quantity: 6,
     short_description:
-      'Không gian riêng tư, sạch sẽ với 1 giường đôi êm ái, ốp tường vân gỗ ấm cúng, ghế thư giãn, điều hòa, TV và phòng tắm riêng có bình nóng lạnh.',
+      'Không gian riêng tư, sạch sẽ với 1 giường đôi êm ái dành cho 1–2 người, ốp tường vân gỗ ấm cúng, ghế thư giãn, điều hòa, TV và phòng tắm riêng có bình nóng lạnh.',
     full_description:
-      'Phòng 1 giường đôi tại Nhà Nghỉ Tha Phương được thiết kế tối ưu cho cặp đôi, khách đi công tác hoặc du lịch cá nhân cần sự yên tĩnh, sạch sẽ và tiện nghi. Phòng sử dụng tông nội thất ốp lam gỗ ấm áp kết hợp sàn gạch vân đá sáng bóng, trang bị đầy đủ điều hòa nhiệt độ, quạt mát, tivi màn hình phẳng, ghế sofa thư giãn và phòng tắm khép kín có máy nước nóng Ariston cùng bộ vệ sinh cá nhân đầy đủ.',
+      'Phòng Đơn 1 Giường Đôi tại Nhà Nghỉ Tha Phương được thiết kế tối ưu cho cặp đôi, khách đi công tác hoặc du lịch cá nhân cần sự yên tĩnh, sạch sẽ và tiện nghi. Phòng sử dụng tông nội thất ốp lam gỗ ấm áp kết hợp sàn gạch vân đá sáng bóng, trang bị đầy đủ điều hòa nhiệt độ, quạt mát, tivi màn hình phẳng, ghế sofa thư giãn và phòng tắm khép kín có máy nước nóng Ariston cùng bộ vệ sinh cá nhân đầy đủ.',
     policies:
-      'Nhận phòng từ 14:00 – Trả phòng trước 12:00. Thanh toán trực tiếp tại quầy lễ tân khi nhận phòng. Vui lòng xuất trình giấy tờ tùy thân (CCCD/CMND/Hộ chiếu) khi làm thủ tục nhận phòng.',
+      'Nhận phòng từ 14:00 – Trả phòng trước 12:00. Vui lòng xuất trình giấy tờ tùy thân (CCCD/CMND/Hộ chiếu) khi làm thủ tục nhận phòng.',
     status: 'available',
     is_published: true,
     is_featured: true,
@@ -165,7 +165,7 @@ export const INITIAL_ROOMS: Room[] = [
   {
     id: 'room-2-beds',
     room_code: 'TP-201',
-    name: 'Phòng Đôi 2 Giường Lớn (Deluxe Twin)',
+    name: 'Phòng Đôi 2 Giường Lớn (2–4 Người)',
     slug: 'phong-2-giuong-deluxe-twin',
     room_type: '2_beds',
     room_type_label: 'Phòng 2 giường',
@@ -176,11 +176,11 @@ export const INITIAL_ROOMS: Room[] = [
     price_per_night: 450000,
     total_quantity: 4,
     short_description:
-      'Phòng rộng rãi với 2 giường lớn dành cho gia đình nhỏ hoặc nhóm bạn 3–4 người. Đầy đủ điều hòa, TV, Wi-Fi tốc độ cao và phòng tắm khép kín.',
+      'Phòng rộng rãi với 2 giường lớn dành cho 2–4 người. Đầy đủ điều hòa, TV, Wi-Fi tốc độ cao và phòng tắm khép kín sạch sẽ.',
     full_description:
-      'Phòng 2 giường (Deluxe Twin) mang đến không gian sinh hoạt thoải mái cho gia đình hoặc nhóm bạn bè cùng lưu trú. Phòng được bố trí 2 giường ngủ êm ái, lối đi rộng thoáng, ốp tường gỗ sang trọng, đầy đủ điều hòa, quạt mát, tivi màn hình phẳng và phòng tắm riêng có bình nóng lạnh. Bạn có thể dễ dàng cập nhật bộ ảnh riêng của phòng 2 giường trong phần Quản lý phòng (Admin) hoặc thư mục public/images/rooms/phong-2-giuong.',
+      'Phòng Đôi 2 Giường Lớn mang đến không gian sinh hoạt thoải mái cho gia đình hoặc nhóm bạn bè cùng lưu trú. Phòng được bố trí 2 giường ngủ êm ái, lối đi rộng thoáng, ốp tường gỗ sang trọng, đầy đủ điều hòa, quạt mát, tivi màn hình phẳng và phòng tắm riêng có bình nóng lạnh.',
     policies:
-      'Nhận phòng từ 14:00 – Trả phòng trước 12:00. Thanh toán trực tiếp tại nhà nghỉ khi nhận phòng. Hỗ trợ nhận phòng sớm nếu còn phòng trống.',
+      'Nhận phòng từ 14:00 – Trả phòng trước 12:00. Hỗ trợ nhận phòng linh hoạt 24/7.',
     status: 'available',
     is_published: true,
     is_featured: true,
@@ -193,7 +193,7 @@ export const INITIAL_ROOMS: Room[] = [
         room_id: 'room-2-beds',
         media_type: 'image',
         url: '/images/rooms/phong-1-giuong/khong-gian-phong.jpg',
-        alt_text: 'Không gian nội thất thực tế tại Nhà Nghỉ Tha Phương (Đang dùng ảnh thực tế của nhà nghỉ)',
+        alt_text: 'Không gian nội thất thực tế tại Nhà Nghỉ Tha Phương',
         is_primary: true,
         sort_order: 1,
       },
@@ -223,22 +223,22 @@ export const INITIAL_ROOMS: Room[] = [
   {
     id: 'room-3-beds',
     room_code: 'TP-301',
-    name: 'Phòng Gia Đình 3 Giường (Family Suite)',
+    name: 'Phòng 3 Người / Gia Đình (3 Giường)',
     slug: 'phong-3-giuong-family-suite',
     room_type: '3_beds',
-    room_type_label: 'Phòng 3 giường',
+    room_type_label: 'Phòng 3 người',
     bed_count: 3,
-    max_adults: 6,
+    max_adults: 3,
     max_children: 2,
-    area_sqm: 40,
+    area_sqm: 38,
     price_per_night: 650000,
     total_quantity: 2,
     short_description:
-      'Hạng phòng diện tích lớn với 3 giường ngủ, lý tưởng cho đoàn khách gia đình hoặc nhóm công tác đông người muốn ở chung ấm cúng, tiết kiệm.',
+      'Phòng rộng rãi dành cho nhóm 3 người hoặc gia đình có 3 giường ngủ êm ái, đầy đủ điều hòa, TV, Wi-Fi tốc độ cao và phòng tắm riêng.',
     full_description:
-      'Phòng 3 giường (Family Suite) là lựa chọn tối ưu cho đại gia đình hoặc nhóm bạn từ 4 đến 6 người. Không gian phòng thoáng đãng, sạch sẽ, trang bị đầy đủ điều hòa công suất lớn, quạt tường, tivi, Wi-Fi tốc độ cao và phòng tắm riêng biệt tiện nghi. (Lưu ý: Hiện tại đang hiển thị hình ảnh không gian mẫu của nhà nghỉ, chủ nhà có thể tải ảnh thực tế của phòng 3 giường lên bất kỳ lúc nào qua trang Quản trị Admin).',
+      'Phòng 3 Người (3 Giường) là lựa chọn lý tưởng cho nhóm 3 người hoặc gia đình muốn ở chung một phòng rộng rãi, ấm cúng và tiện lợi. Không gian phòng thoáng đãng, sạch sẽ, trang bị đầy đủ điều hòa, quạt mát, tivi, Wi-Fi tốc độ cao và phòng tắm riêng biệt có bình nóng lạnh.',
     policies:
-      'Nhận phòng từ 14:00 – Trả phòng trước 12:00. Thanh toán trực tiếp tại quầy lễ tân khi nhận phòng.',
+      'Nhận phòng từ 14:00 – Trả phòng trước 12:00. Hỗ trợ nhận phòng linh hoạt 24/7.',
     status: 'available',
     is_published: true,
     is_featured: true,
