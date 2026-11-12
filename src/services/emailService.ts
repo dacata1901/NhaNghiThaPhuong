@@ -2,7 +2,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { formatDateVN } from '@/lib/utils';
 import type { Booking, ContactMessage } from '@/types';
 
-export const DEFAULT_TEST_NOTIFICATION_EMAIL = 'minhkhang19012006@gmail.com';
+export const DEFAULT_TEST_NOTIFICATION_EMAIL = 'huynhduykhanh0406@gmail.com';
 export const DEFAULT_RESEND_API_KEY =
   import.meta.env.VITE_RESEND_API_KEY ||
   ['re', 'UCFSLCLx', 'MurbtbVeHsBWBEr5RB8fs5V5'].join('_');

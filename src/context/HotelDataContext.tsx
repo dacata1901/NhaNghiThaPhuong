@@ -255,7 +255,7 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   );
   const [settings, setSettings] = useState<HotelSettings>(() => {
     const loaded = loadFromStorage(STORAGE_KEYS.SETTINGS, INITIAL_HOTEL_SETTINGS);
-    if (!loaded.email_notification || loaded.email_notification === 'huynhduykhanh0406@gmail.com') {
+    if (!loaded.email_notification || loaded.email_notification === 'minhkhang19012006@gmail.com') {
       loaded.email_notification = DEFAULT_TEST_NOTIFICATION_EMAIL;
     }
     return loaded;
@@ -948,7 +948,7 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       ]);
       playNotificationChime(settings.sound_alerts_enabled);
 
-      // Send email notification to settings.email_notification (default: minhkhang19012006@gmail.com)
+      // Send email notification to settings.email_notification (default: huynhduykhanh0406@gmail.com)
       sendContactNotificationEmail(newMsg, settings.email_notification).catch(() => {});
 
       if (isSupabaseConfigured && supabase) {

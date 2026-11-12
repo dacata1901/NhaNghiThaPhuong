@@ -20,7 +20,7 @@ serve(async (req: Request) => {
     const fromEmail =
       Deno.env.get('RESEND_FROM_EMAIL') || 'Nhà Nghỉ Tha Phương <onboarding@resend.dev>';
     const targetEmail =
-      host_email || Deno.env.get('HOST_NOTIFICATION_EMAIL') || 'minhkhang19012006@gmail.com';
+      host_email || Deno.env.get('HOST_NOTIFICATION_EMAIL') || 'huynhduykhanh0406@gmail.com';
 
     if (!resendApiKey) {
       return new Response(

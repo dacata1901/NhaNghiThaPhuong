@@ -278,7 +278,7 @@ export const INITIAL_HOTEL_SETTINGS: HotelSettings = {
   sub_tagline: 'NHÀ NGHỈ THA PHƯƠNG · SẠCH SẼ · RIÊNG TƯ · GIÁ TỐT',
   logo_text: 'THA PHƯƠNG',
   phone_primary: '0944 861 242',
-  email_notification: 'minhkhang19012006@gmail.com',
+  email_notification: 'huynhduykhanh0406@gmail.com',
   address_text: 'Đang cập nhật địa chỉ chi tiết (Vui lòng liên hệ 0944 861 242 để được chỉ đường nhanh nhất)',
   google_maps_embed_url: '',
   check_in_time: '14:00',
