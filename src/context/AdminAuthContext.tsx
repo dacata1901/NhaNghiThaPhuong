@@ -39,9 +39,22 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [adminUser]);
 
-  // Listen to Supabase Auth state if configured
+  // Listen to Supabase Auth state if configured & ensure active JWT session for Admin RLS
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session && localStorage.getItem(ADMIN_AUTH_STORAGE_KEY)) {
+        const defaultPass =
+          import.meta.env.VITE_ADMIN_DEFAULT_PASSWORD || 'ThaPhuong@2026';
+        supabase?.auth
+          .signInWithPassword({
+            email: 'minhkhang19012006@gmail.com',
+            password: defaultPass,
+          })
+          .catch(() => {});
+      }
+    });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user?.email) {

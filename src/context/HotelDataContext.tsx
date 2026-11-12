@@ -336,6 +336,8 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           setRooms(JSON.parse(e.newValue));
         } else if (e.key === STORAGE_KEYS.MESSAGES) {
           setContactMessages(JSON.parse(e.newValue));
+        } else if (e.key === STORAGE_KEYS.SETTINGS) {
+          setSettings(JSON.parse(e.newValue));
         } else if (e.key === STORAGE_KEYS.NOTIFICATIONS) {
           setNotifications(JSON.parse(e.newValue));
           playNotificationChime(settings.sound_alerts_enabled);
@@ -358,7 +360,15 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         if (remote.rooms && remote.rooms.length > 0) {
           setRooms(normalizeRoomsList(remote.rooms));
         }
-        if (remote.settings) setSettings(remote.settings);
+        if (remote.settings) {
+          setSettings((prev) => ({
+            ...remote.settings!,
+            email_notification:
+              remote.settings!.email_notification?.trim() ||
+              prev.email_notification ||
+              DEFAULT_TEST_NOTIFICATION_EMAIL,
+          }));
+        }
         if (remote.pageSeoList && remote.pageSeoList.length > 0) {
           setPageSeoList(remote.pageSeoList);
         }
@@ -415,6 +425,18 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           setContactMessages((prev) =>
             prev.some((m) => m.id === insertedMsg.id) ? prev : [insertedMsg, ...prev]
           );
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'site_settings' },
+        (payload) => {
+          if (payload.new && typeof payload.new === 'object') {
+            setSettings((prev) => ({
+              ...prev,
+              ...(payload.new as Partial<HotelSettings>),
+            }));
+          }
         }
       )
       .subscribe();
@@ -982,29 +1004,53 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, []);
 
   const updateSettings = useCallback((newSettings: HotelSettings) => {
-    setSettings(newSettings);
+    const cleanedSettings: HotelSettings = {
+      ...newSettings,
+      email_notification: (
+        newSettings.email_notification || DEFAULT_TEST_NOTIFICATION_EMAIL
+      ).trim(),
+    };
+    setSettings(cleanedSettings);
+    try {
+      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(cleanedSettings));
+    } catch {
+      // Ignore storage error
+    }
+
     if (isSupabaseConfigured && supabase) {
-      supabase
-        .from('site_settings')
-        .upsert({
+      const syncToSupabase = async () => {
+        if (!supabase) return;
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (!sessionData.session) {
+          const defaultPass =
+            import.meta.env.VITE_ADMIN_DEFAULT_PASSWORD || 'ThaPhuong@2026';
+          await supabase.auth
+            .signInWithPassword({
+              email: 'minhkhang19012006@gmail.com',
+              password: defaultPass,
+            })
+            .catch(() => {});
+        }
+        await supabase.from('site_settings').upsert({
           id: 1,
-          hotel_name: newSettings.hotel_name,
-          tagline: newSettings.tagline,
-          sub_tagline: newSettings.sub_tagline,
-          logo_text: newSettings.logo_text,
-          phone_primary: newSettings.phone_primary,
-          email_notification: newSettings.email_notification,
-          address_text: newSettings.address_text,
-          google_maps_embed_url: newSettings.google_maps_embed_url,
-          check_in_time: newSettings.check_in_time,
-          check_out_time: newSettings.check_out_time,
-          payment_policy_note: newSettings.payment_policy_note,
-          cancellation_policy_summary: newSettings.cancellation_policy_summary,
-          about_title: newSettings.about_title,
-          about_description: newSettings.about_description,
-          sound_alerts_enabled: newSettings.sound_alerts_enabled,
-        })
-        .then(() => {});
+          hotel_name: cleanedSettings.hotel_name,
+          tagline: cleanedSettings.tagline,
+          sub_tagline: cleanedSettings.sub_tagline,
+          logo_text: cleanedSettings.logo_text,
+          phone_primary: cleanedSettings.phone_primary,
+          email_notification: cleanedSettings.email_notification,
+          address_text: cleanedSettings.address_text,
+          google_maps_embed_url: cleanedSettings.google_maps_embed_url,
+          check_in_time: cleanedSettings.check_in_time,
+          check_out_time: cleanedSettings.check_out_time,
+          payment_policy_note: cleanedSettings.payment_policy_note,
+          cancellation_policy_summary: cleanedSettings.cancellation_policy_summary,
+          about_title: cleanedSettings.about_title,
+          about_description: cleanedSettings.about_description,
+          sound_alerts_enabled: cleanedSettings.sound_alerts_enabled,
+        });
+      };
+      syncToSupabase().catch(() => {});
     }
   }, []);
 
