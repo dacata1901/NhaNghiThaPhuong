@@ -38,16 +38,10 @@ const quickBookingSchema = z.object({
 
 type QuickBookingFormValues = z.infer<typeof quickBookingSchema>;
 
-const QUICK_TIME_PRESETS = [
-  { label: '08:00 Sáng', value: '08:00' },
-  { label: '10:00 Sáng', value: '10:00' },
-  { label: '12:00 Trưa', value: '12:00' },
-  { label: '14:00 Chiều', value: '14:00' },
-  { label: '16:00 Chiều', value: '16:00' },
-  { label: '18:00 Tối', value: '18:00' },
-  { label: '20:00 Tối', value: '20:00' },
-  { label: '22:00 Đêm', value: '22:00' },
-];
+const HOURS_24 = Array.from({ length: 24 }, (_, i) =>
+  String(i).padStart(2, '0')
+);
+const MINUTES_STEP = ['00', '15', '30', '45'];
 
 export const BookingPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -324,11 +318,16 @@ export const BookingPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* 3. Thời gian nhận phòng cụ thể (Ngày + Giờ phút chính xác) */}
+                {/* 3. Thời gian nhận phòng (Chọn múi giờ 24h thông minh) */}
                 <div className="p-4 sm:p-5 rounded-2xl bg-bg-ivory border border-border-default space-y-4">
-                  <label className="block text-sm sm:text-base font-extrabold text-text-primary">
-                    3. Thời gian nhận phòng cụ thể:
-                  </label>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <label className="text-sm sm:text-base font-extrabold text-text-primary">
+                      3. Thời gian nhận phòng:
+                    </label>
+                    <span className="text-xs font-bold text-state-success bg-state-success/10 px-2.5 py-1 rounded-lg">
+                      Nhận &amp; trả phòng linh hoạt
+                    </span>
+                  </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -348,37 +347,41 @@ export const BookingPage: React.FC = () => {
                     <div>
                       <span className="text-xs font-extrabold text-text-primary mb-1.5 flex items-center gap-1.5">
                         <Clock className="w-4 h-4 text-brand-gold-dark" />
-                        Giờ &amp; Phút nhận phòng dự kiến
+                        Giờ nhận phòng (Hệ 24 giờ)
                       </span>
-                      <input
-                        type="time"
-                        value={arrivalTime}
-                        onChange={(e) => setArrivalTime(e.target.value || '14:00')}
-                        className="w-full h-11 px-3.5 rounded-xl bg-bg-ivory-white border border-border-strong text-sm font-extrabold text-text-primary focus:outline-none focus:border-brand-gold"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Nút chọn nhanh mốc giờ cụ thể */}
-                  <div>
-                    <span className="block text-xs font-bold text-text-secondary mb-2">
-                      Hoặc bấm chọn nhanh mốc giờ nhận phòng:
-                    </span>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      {QUICK_TIME_PRESETS.map((preset) => (
-                        <button
-                          key={preset.value}
-                          type="button"
-                          onClick={() => setArrivalTime(preset.value)}
-                          className={`py-2 px-2.5 rounded-xl text-xs font-extrabold border transition-all ${
-                            arrivalTime === preset.value
-                              ? 'bg-bg-wood-deep text-white border-bg-wood-deep shadow-xs'
-                              : 'bg-bg-ivory-white text-text-primary border-border-default hover:border-brand-gold'
-                          }`}
+                      <div className="grid grid-cols-2 gap-2">
+                        <select
+                          aria-label="Giờ nhận phòng (00-23)"
+                          value={arrivalTime.split(':')[0] || '14'}
+                          onChange={(e) => {
+                            const mins = arrivalTime.split(':')[1] || '00';
+                            setArrivalTime(`${e.target.value}:${mins}`);
+                          }}
+                          className="w-full h-11 px-3 rounded-xl bg-bg-ivory-white border border-border-strong text-sm font-extrabold text-text-primary focus:outline-none focus:border-brand-gold cursor-pointer"
                         >
-                          {preset.label}
-                        </button>
-                      ))}
+                          {HOURS_24.map((h) => (
+                            <option key={h} value={h}>
+                              {h} giờ
+                            </option>
+                          ))}
+                        </select>
+
+                        <select
+                          aria-label="Phút nhận phòng"
+                          value={arrivalTime.split(':')[1] || '00'}
+                          onChange={(e) => {
+                            const hrs = arrivalTime.split(':')[0] || '14';
+                            setArrivalTime(`${hrs}:${e.target.value}`);
+                          }}
+                          className="w-full h-11 px-3 rounded-xl bg-bg-ivory-white border border-border-strong text-sm font-extrabold text-text-primary focus:outline-none focus:border-brand-gold cursor-pointer"
+                        >
+                          {MINUTES_STEP.map((m) => (
+                            <option key={m} value={m}>
+                              {m} phút
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
                   </div>
 
@@ -411,7 +414,7 @@ export const BookingPage: React.FC = () => {
                       Nhận phòng: <strong className="text-state-success">{formattedArrivalDetail}</strong>
                     </span>
                     <span>
-                      Trả phòng dự kiến: <strong>{formatDateVN(checkOutDate)}</strong>
+                      Trả phòng: <strong>{formatDateVN(checkOutDate)} (Linh hoạt)</strong>
                     </span>
                   </div>
                 </div>

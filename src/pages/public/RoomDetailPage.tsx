@@ -124,7 +124,7 @@ export const RoomDetailPage: React.FC = () => {
                   </span>
                   <span className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-bg-linen border border-border-default text-xs font-bold text-text-primary">
                     <Clock className="w-4 h-4 text-brand-gold-dark" />
-                    Nhận phòng linh hoạt 24/7
+                    Thời gian nhận và trả phòng linh hoạt
                   </span>
                 </div>
 

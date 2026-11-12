@@ -93,36 +93,47 @@ export const ContactPage: React.FC = () => {
         canonicalPath="/contact"
       />
 
-      <section className="pt-28 pb-16 bg-bg-ivory min-h-screen">
+      <section className="pt-24 sm:pt-28 pb-16 bg-bg-linen min-h-screen">
         <div className="container-luxury max-w-5xl mx-auto">
           <div className="text-center mb-10">
+            <span className="inline-block text-xs font-extrabold uppercase tracking-widest text-brand-gold-dark bg-brand-champagne/60 px-3.5 py-1.5 rounded-full mb-3">
+              Hỗ trợ khách hàng 24/7
+            </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-text-primary">
               Liên Hệ &amp; Gửi Tin Nhắn
             </h1>
-            <p className="text-sm sm:text-base font-medium text-text-secondary mt-2">
+            <p className="text-sm sm:text-base font-medium text-text-secondary mt-2 max-w-xl mx-auto">
               Bấm trực tiếp vào số điện thoại để <strong>Gọi điện</strong> hoặc{' '}
-              <strong>Nhắn tin SMS</strong> với lễ tân Nhà Nghỉ Tha Phương
+              <strong>Nhắn tin SMS</strong> với lễ tân {settings.hotel_name}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Cột trái: Thông tin liên hệ */}
-            <div className="lg:col-span-5 bg-bg-wood-deep text-text-on-dark rounded-2xl p-6 sm:p-8 shadow-luxury-md space-y-6">
-              <h2 className="text-xl font-extrabold text-brand-gold-light">
-                {settings.hotel_name}
-              </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
+            {/* Cột trái: Thông tin liên hệ trình bày sáng rõ, tương phản cao */}
+            <div className="lg:col-span-5 bg-bg-ivory-white border border-border-default rounded-2xl shadow-luxury-md overflow-hidden">
+              <div className="bg-bg-wood-deep px-6 py-5 border-b border-brand-gold/30">
+                <h2 className="text-xl font-extrabold text-white">
+                  {settings.hotel_name}
+                </h2>
+                <p className="text-xs font-semibold text-brand-gold-light mt-1">
+                  Thông tin liên hệ chính thức &amp; tiếp nhận đặt phòng
+                </p>
+              </div>
 
-              <div className="space-y-5 text-sm">
-                <div className="p-4 rounded-2xl bg-white/10 border border-brand-gold/30 space-y-3">
+              <div className="p-5 sm:p-6 space-y-4 text-sm">
+                {/* Hotline nổi bật */}
+                <div className="p-4 rounded-2xl bg-bg-ivory border-2 border-brand-gold/40 space-y-3">
                   <div className="flex items-start gap-3">
-                    <Phone className="w-5 h-5 text-brand-gold-light shrink-0 mt-0.5" />
+                    <div className="w-9 h-9 rounded-xl bg-brand-gold/15 text-brand-gold-dark flex items-center justify-center shrink-0">
+                      <Phone className="w-4 h-4" />
+                    </div>
                     <div>
-                      <span className="text-xs font-bold text-text-on-dark/80 block">
-                        Hotline lễ tân 24/7 (Bấm để Gọi hoặc Nhắn SMS)
+                      <span className="text-xs font-bold text-text-secondary block">
+                        Hotline lễ tân 24/7
                       </span>
                       <a
                         href={`tel:${settings.phone_primary.replace(/\s+/g, '')}`}
-                        className="text-xl font-extrabold text-brand-gold-light hover:underline"
+                        className="text-xl font-extrabold text-text-primary hover:text-brand-gold-dark transition-colors"
                       >
                         {settings.phone_primary}
                       </a>
@@ -135,38 +146,51 @@ export const ContactPage: React.FC = () => {
                   />
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-brand-gold-light shrink-0 mt-0.5" />
-                  <div>
-                    <span className="text-xs font-bold text-text-on-dark/70 block">
+                {/* Email */}
+                <div className="p-3.5 rounded-2xl bg-bg-ivory border border-border-default flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-brand-champagne/60 text-brand-gold-dark flex items-center justify-center shrink-0">
+                    <Mail className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-xs font-bold text-text-secondary block">
                       Email tiếp nhận thông tin
                     </span>
-                    <span className="font-bold text-brand-gold-light break-all">
+                    <a
+                      href={`mailto:${recipientEmail}`}
+                      className="font-extrabold text-text-primary hover:text-brand-gold-dark break-all transition-colors"
+                    >
                       {recipientEmail}
+                    </a>
+                  </div>
+                </div>
+
+                {/* Thời gian nhận & trả phòng */}
+                <div className="p-3.5 rounded-2xl bg-bg-ivory border border-border-default flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-state-success/15 text-state-success flex items-center justify-center shrink-0">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-text-secondary block">
+                      Thời gian phục vụ
+                    </span>
+                    <span className="font-extrabold text-text-primary">
+                      Thời gian nhận và trả phòng linh hoạt
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <Clock className="w-5 h-5 text-brand-gold-light shrink-0 mt-0.5" />
-                  <div>
-                    <span className="text-xs font-bold text-text-on-dark/70 block">
-                      Giờ nhận &amp; trả phòng linh hoạt
-                    </span>
-                    <span className="font-semibold">
-                      Nhận phòng <strong>{settings.check_in_time}</strong> • Trả phòng{' '}
-                      <strong>{settings.check_out_time}</strong>
-                    </span>
+                {/* Địa chỉ */}
+                <div className="p-3.5 rounded-2xl bg-bg-ivory border border-border-default flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-brand-champagne/60 text-brand-gold-dark flex items-center justify-center shrink-0">
+                    <MapPin className="w-4 h-4" />
                   </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-brand-gold-light shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-xs font-bold text-text-on-dark/70 block">
-                      Địa chỉ
+                    <span className="text-xs font-bold text-text-secondary block">
+                      Địa chỉ nhà nghỉ
                     </span>
-                    <span className="font-semibold">{settings.address_text}</span>
+                    <span className="font-bold text-text-primary leading-relaxed">
+                      {settings.address_text}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -174,12 +198,14 @@ export const ContactPage: React.FC = () => {
 
             {/* Cột phải: Khung gửi tin nhắn */}
             <div className="lg:col-span-7 bg-bg-ivory-white border border-border-default rounded-2xl p-6 sm:p-8 shadow-luxury-md">
-              <div className="mb-6">
-                <h2 className="text-xl font-extrabold text-text-primary flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5 text-brand-gold-dark" />
+              <div className="mb-6 pb-4 border-b border-border-default">
+                <h2 className="text-xl font-extrabold text-text-primary flex items-center gap-2.5">
+                  <span className="w-9 h-9 rounded-xl bg-brand-gold/15 text-brand-gold-dark flex items-center justify-center shrink-0">
+                    <MessageSquare className="w-5 h-5" />
+                  </span>
                   Gửi Lời Nhắn Tới Lễ Tân
                 </h2>
-                <p className="text-xs font-medium text-text-secondary mt-1">
+                <p className="text-xs sm:text-sm font-medium text-text-secondary mt-1.5">
                   Điền họ tên và số điện thoại, lễ tân sẽ gọi điện hoặc nhắn tin phản hồi ngay.
                 </p>
               </div>
@@ -221,7 +247,7 @@ export const ContactPage: React.FC = () => {
                 <TextAreaField
                   label="Nội dung lời nhắn / Yêu cầu"
                   placeholder="Nhập câu hỏi hoặc yêu cầu đặt phòng của bạn..."
-                  rows={3}
+                  rows={4}
                   required
                   error={errors.message?.message}
                   {...register('message')}

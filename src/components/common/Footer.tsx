@@ -86,8 +86,7 @@ export const Footer: React.FC = () => {
               <li className="flex items-center gap-2.5">
                 <Clock className="w-4 h-4 text-brand-gold shrink-0" />
                 <span className="font-semibold">
-                  Nhận phòng linh hoạt 24/7 · Trả phòng trước{' '}
-                  <strong>{settings.check_out_time}</strong>
+                  Thời gian nhận và trả phòng linh hoạt
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
