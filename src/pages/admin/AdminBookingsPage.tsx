@@ -16,9 +16,11 @@ import { useHotelData } from '@/context/HotelDataContext';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Modal } from '@/components/ui/Modal';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { PhoneActions } from '@/components/ui/PhoneActions';
 import { TextAreaField } from '@/components/ui/InputField';
-import { formatVND, formatDateVN, formatDateTimeVN } from '@/lib/utils';
-import type { Booking, BookingStatus, PaymentStatus } from '@/types';
+import { formatDateVN, formatDateTimeVN } from '@/lib/utils';
+import type { Booking, BookingStatus } from '@/types';
 
 export const AdminBookingsPage: React.FC = () => {
   const {
@@ -36,8 +38,14 @@ export const AdminBookingsPage: React.FC = () => {
   // Detail Modal State
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [internalNotesDraft, setInternalNotesDraft] = useState('');
-  const [statusChangeNote, setStatusChangeNote] = useState('');
   const [notesSavedToast, setNotesSavedToast] = useState(false);
+
+  // Confirm Dialog State for every status change
+  const [pendingStatusAction, setPendingStatusAction] = useState<{
+    booking: Booking;
+    newStatus: BookingStatus;
+    note: string;
+  } | null>(null);
 
   const filteredBookings = useMemo(() => {
     return bookings.filter((b) => {
@@ -47,7 +55,7 @@ export const AdminBookingsPage: React.FC = () => {
         b.booking_code.toLowerCase().includes(q) ||
         b.guest_name.toLowerCase().includes(q) ||
         b.guest_phone.toLowerCase().includes(q) ||
-        b.guest_email.toLowerCase().includes(q);
+        (b.room_name || '').toLowerCase().includes(q);
 
       const matchesStatus = statusFilter === 'all' || b.status === statusFilter;
 
@@ -63,29 +71,23 @@ export const AdminBookingsPage: React.FC = () => {
   const handleOpenDetail = (bk: Booking) => {
     setSelectedBooking(bk);
     setInternalNotesDraft(bk.internal_admin_notes || '');
-    setStatusChangeNote('');
     setNotesSavedToast(false);
   };
 
-  const handleUpdateStatus = (
-    bookingId: string,
-    newStatus: BookingStatus,
-    defaultNote: string,
-    paymentStatus?: PaymentStatus
-  ) => {
-    const note = statusChangeNote.trim() || defaultNote;
-    updateBookingStatus(bookingId, newStatus, note, paymentStatus);
-    setStatusChangeNote('');
-    // Refresh selectedBooking if open
+  const handleConfirmStatusUpdate = () => {
+    if (!pendingStatusAction) return;
+    const { booking, newStatus, note } = pendingStatusAction;
+    updateBookingStatus(booking.id, newStatus, note);
+
     setSelectedBooking((prev) =>
-      prev && prev.id === bookingId
+      prev && prev.id === booking.id
         ? {
             ...prev,
             status: newStatus,
-            payment_status: paymentStatus || prev.payment_status,
           }
         : prev
     );
+    setPendingStatusAction(null);
   };
 
   const handleSaveInternalNotes = () => {
@@ -99,40 +101,35 @@ export const AdminBookingsPage: React.FC = () => {
     setTimeout(() => setNotesSavedToast(false), 2500);
   };
 
-  // Export filtered bookings to Excel (.xlsx)
+  // Export filtered bookings to Excel (.xlsx) without prices
   const handleExportExcel = () => {
     const rows = filteredBookings.map((b, idx) => ({
       STT: idx + 1,
-      'Mã Booking': b.booking_code,
+      'Mã Đặt Phòng': b.booking_code,
       'Tên Khách Hàng': b.guest_name,
       'Số Điện Thoại': b.guest_phone,
-      Email: b.guest_email,
-      'Hạng Phòng': b.room_name || '',
+      'Loại Phòng Muốn Đặt': b.room_name || '',
       'Mã Phòng': b.room_code || '',
       'Ngày Nhận Phòng': formatDateVN(b.check_in_date),
       'Ngày Trả Phòng': formatDateVN(b.check_out_date),
       'Số Đêm': b.nights_count,
-      'Người Lớn': b.adults_count,
-      'Trẻ Em': b.children_count,
-      'Đơn Giá / Đêm (VNĐ)': b.price_per_night_snapshot,
-      'Tổng Tiền (VNĐ)': b.total_amount,
-      'Trạng Thái Booking': b.status,
-      'Trạng Thái Thanh Toán': b.payment_status,
-      'Ghi Chú Khách Hàng': b.customer_notes || '',
+      'Số Khách': b.adults_count,
+      'Giờ Nhận Phòng & Ghi Chú': b.customer_notes || '',
+      'Trạng Thái': b.status,
       'Ghi Chú Nội Bộ': b.internal_admin_notes || '',
-      'Thời Gian Tạo': formatDateTimeVN(b.created_at),
+      'Thời Gian Đăng Ký': formatDateTimeVN(b.created_at),
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'DanhSachBooking');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'DanhSachDatPhong');
     XLSX.writeFile(
       workbook,
-      `Booking_NhaNghiThaPhuong_${new Date().toISOString().slice(0, 10)}.xlsx`
+      `DatPhong_NhaNghiThaPhuong_${new Date().toISOString().slice(0, 10)}.xlsx`
     );
   };
 
-  // Print formatted booking slip in a clean popup/print window
+  // Print formatted booking slip without prices
   const handlePrintBookingSlip = (bk: Booking) => {
     const printWin = window.open('', '_blank', 'width=820,height=720');
     if (!printWin) {
@@ -150,7 +147,7 @@ export const AdminBookingsPage: React.FC = () => {
           body { font-family: Arial, sans-serif; color: #30251F; padding: 32px; line-height: 1.6; }
           .header { border-bottom: 2px solid #B69A68; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; }
           h1 { margin: 0; font-size: 22px; text-transform: uppercase; }
-          .code-box { background: #F8F5EF; border: 1px solid #B69A68; padding: 12px 18px; font-weight: bold; font-size: 18px; }
+          .code-box { background: #F8F5EF; border: 1px solid #B69A68; padding: 12px 18px; font-weight: bold; font-size: 18px; border-radius: 10px; }
           table { width: 100%; border-collapse: collapse; margin-top: 16px; }
           th, td { border: 1px solid #E0D5C2; padding: 10px 12px; text-align: left; font-size: 14px; }
           th { background: #EFE8DA; width: 35%; }
@@ -161,24 +158,22 @@ export const AdminBookingsPage: React.FC = () => {
         <div class="header">
           <div>
             <h1>${settings.hotel_name}</h1>
-            <div>Hotline lễ tân: ${settings.phone_primary} | Email: ${settings.email_notification}</div>
-            <div>Địa chỉ: ${settings.address_text}</div>
+            <div><strong>Hotline lễ tân:</strong> ${settings.phone_primary}</div>
+            <div><strong>Địa chỉ:</strong> ${settings.address_text}</div>
           </div>
           <div class="code-box">
             MÃ ĐẶT PHÒNG<br/>${bk.booking_code}
           </div>
         </div>
-        <h2>PHIẾU XÁC NHẬN ĐẶT PHÒNG LƯU TRÚ</h2>
+        <h2>PHIẾU XÁC NHẬN THÔNG TIN ĐẶT PHÒNG</h2>
         <table>
           <tr><th>Họ và tên khách hàng</th><td><strong>${bk.guest_name}</strong></td></tr>
-          <tr><th>Số điện thoại / Email</th><td>${bk.guest_phone} — ${bk.guest_email}</td></tr>
-          <tr><th>Hạng phòng đăng ký</th><td><strong>${bk.room_name} (${bk.room_code})</strong></td></tr>
-          <tr><th>Ngày nhận phòng</th><td>${formatDateVN(bk.check_in_date)} (từ ${settings.check_in_time})</td></tr>
-          <tr><th>Ngày trả phòng</th><td>${formatDateVN(bk.check_out_date)} (trước ${settings.check_out_time})</td></tr>
-          <tr><th>Thời gian & Số khách</th><td>${bk.nights_count} đêm — ${bk.adults_count} người lớn, ${bk.children_count} trẻ em</td></tr>
-          <tr><th>Đơn giá tại thời điểm đặt</th><td>${formatVND(bk.price_per_night_snapshot)} / đêm</td></tr>
-          <tr><th>TỔNG TIỀN THANH TOÁN</th><td><strong style="font-size:18px;">${formatVND(bk.total_amount)}</strong> (Thu trực tiếp tại lễ tân)</td></tr>
-          <tr><th>Ghi chú của khách</th><td>${bk.customer_notes || 'Không có'}</td></tr>
+          <tr><th>Số điện thoại liên hệ</th><td><strong>${bk.guest_phone}</strong></td></tr>
+          <tr><th>Loại phòng muốn đặt</th><td><strong>${bk.room_name} (${bk.room_code})</strong></td></tr>
+          <tr><th>Ngày nhận phòng</th><td><strong>${formatDateVN(bk.check_in_date)}</strong></td></tr>
+          <tr><th>Ngày trả phòng dự kiến</th><td><strong>${formatDateVN(bk.check_out_date)}</strong> (${bk.nights_count} đêm)</td></tr>
+          <tr><th>Số lượng khách</th><td><strong>${bk.adults_count} người</strong></td></tr>
+          <tr><th>Giờ nhận phòng & Ghi chú</th><td><strong>${bk.customer_notes || 'Không có ghi chú'}</strong></td></tr>
         </table>
         <div class="footer">
           <div>
@@ -186,7 +181,7 @@ export const AdminBookingsPage: React.FC = () => {
             (${bk.guest_name})
           </div>
           <div>
-            <strong>Đại diện lễ tân ${settings.hotel_name}</strong><br/><br/><br/>
+            <strong>Lễ tân ${settings.hotel_name}</strong><br/><br/><br/>
             (Ký & ghi rõ họ tên)
           </div>
         </div>
@@ -204,16 +199,16 @@ export const AdminBookingsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header & Export Excel Bar */}
-      <div className="bg-bg-ivory-white border border-border-default rounded-classic p-6 shadow-luxury-sm flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-bg-ivory-white border border-border-default rounded-2xl p-6 shadow-luxury-sm flex flex-wrap items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-widest text-brand-gold-dark">
-            RESERVATION MANAGEMENT • QUẢN LÝ ĐẶT PHÒNG
+          <span className="text-xs font-extrabold uppercase tracking-widest text-brand-gold-dark">
+            QUẢN LÝ ĐƠN ĐẶT PHÒNG ĐƠN GIẢN
           </span>
-          <h2 className="font-serif text-2xl font-bold text-text-primary mt-1">
-            Danh Sách Đơn Đặt Phòng ({filteredBookings.length} đơn)
+          <h2 className="font-serif text-2xl font-extrabold text-text-primary mt-1">
+            Danh Sách Khách Đặt Phòng ({filteredBookings.length} đơn)
           </h2>
-          <p className="text-xs text-text-secondary mt-1">
-            Xác nhận, từ chối, đánh dấu hoàn thành, ghi chú nội bộ, in phiếu đặt phòng và xuất báo cáo Excel.
+          <p className="text-xs sm:text-sm font-medium text-text-secondary mt-1">
+            Bấm trực tiếp vào số điện thoại để <strong>Gọi điện / Nhắn SMS</strong>. Mọi thao tác Xác nhận hoặc Hủy đều có bước hỏi lại an toàn.
           </p>
         </div>
 
@@ -221,22 +216,23 @@ export const AdminBookingsPage: React.FC = () => {
           variant="primary"
           leftIcon={<Download className="w-4 h-4" />}
           onClick={handleExportExcel}
+          className="rounded-xl font-extrabold"
         >
-          Xuất file Excel (.xlsx)
+          Xuất danh sách Excel (.xlsx)
         </Button>
       </div>
 
       {/* Filters Bar */}
-      <div className="bg-bg-ivory-white border border-border-default rounded-classic p-4 sm:p-5 shadow-luxury-sm grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+      <div className="bg-bg-ivory-white border border-border-default rounded-2xl p-4 sm:p-5 shadow-luxury-sm grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
         <div className="md:col-span-5 relative">
           <input
             type="text"
-            placeholder="Tìm theo mã booking (TP-2026-...), tên khách hoặc SĐT..."
+            placeholder="Tìm theo tên khách, số điện thoại hoặc tên phòng..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-10 pl-9 pr-3.5 rounded-classic bg-bg-ivory border border-border-default text-xs sm:text-sm focus:outline-none focus:border-brand-gold"
+            className="w-full h-11 pl-9 pr-3.5 rounded-xl bg-bg-ivory border border-border-default text-xs sm:text-sm font-semibold focus:outline-none focus:border-brand-gold"
           />
-          <Search className="w-4 h-4 text-text-muted absolute left-3 top-3" />
+          <Search className="w-4 h-4 text-text-muted absolute left-3 top-3.5" />
         </div>
 
         <div className="md:col-span-4 flex items-center gap-2">
@@ -244,13 +240,13 @@ export const AdminBookingsPage: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as 'all' | BookingStatus)}
-            className="w-full h-10 px-3 rounded-classic bg-bg-ivory border border-border-default text-xs sm:text-sm"
+            className="w-full h-11 px-3 rounded-xl bg-bg-ivory border border-border-default text-xs sm:text-sm font-bold"
           >
             <option value="all">Tất cả trạng thái ({bookings.length})</option>
             <option value="pending">Chờ xác nhận</option>
-            <option value="confirmed">Đã xác nhận</option>
-            <option value="completed">Đã hoàn thành</option>
-            <option value="cancelled">Đã hủy / Từ chối</option>
+            <option value="confirmed">Đã xác nhận giữ phòng</option>
+            <option value="completed">Khách đã nhận phòng / Hoàn thành</option>
+            <option value="cancelled">Đã hủy bỏ</option>
           </select>
         </div>
 
@@ -260,14 +256,14 @@ export const AdminBookingsPage: React.FC = () => {
             type="date"
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="w-full h-10 px-3 rounded-classic bg-bg-ivory border border-border-default text-xs sm:text-sm"
-            title="Lọc theo ngày nhận hoặc trả phòng"
+            className="w-full h-11 px-3 rounded-xl bg-bg-ivory border border-border-default text-xs sm:text-sm font-bold"
+            title="Lọc theo ngày nhận phòng"
           />
           {dateFilter && (
             <button
               type="button"
               onClick={() => setDateFilter('')}
-              className="text-xs text-state-danger hover:underline shrink-0"
+              className="text-xs font-extrabold text-state-danger hover:underline shrink-0"
             >
               Xóa lọc
             </button>
@@ -276,71 +272,126 @@ export const AdminBookingsPage: React.FC = () => {
       </div>
 
       {/* Bookings Table */}
-      <div className="bg-bg-ivory-white border border-border-default rounded-classic shadow-luxury-sm overflow-hidden">
+      <div className="bg-bg-ivory-white border border-border-default rounded-2xl shadow-luxury-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-sm">
             <thead>
-              <tr className="border-b border-border-default text-xs uppercase tracking-wider text-text-muted bg-bg-ivory">
-                <th className="py-3.5 px-4">Mã Booking</th>
-                <th className="py-3.5 px-4">Khách hàng</th>
-                <th className="py-3.5 px-4">Phòng</th>
-                <th className="py-3.5 px-4">Nhận / Trả phòng</th>
-                <th className="py-3.5 px-4">Tổng tiền</th>
+              <tr className="border-b border-border-default text-xs font-extrabold uppercase tracking-wider text-text-secondary bg-bg-ivory">
+                <th className="py-3.5 px-4">Khách hàng &amp; Gọi / SMS</th>
+                <th className="py-3.5 px-4">Phòng muốn đặt</th>
+                <th className="py-3.5 px-4">Ngày lưu trú</th>
+                <th className="py-3.5 px-4">Giờ nhận phòng &amp; Ghi chú</th>
                 <th className="py-3.5 px-4">Trạng thái</th>
-                <th className="py-3.5 px-4 text-right">Thao tác quản trị</th>
+                <th className="py-3.5 px-4 text-right">Thao tác xác nhận</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border-default">
               {filteredBookings.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-text-muted">
-                    Không tìm thấy đơn đặt phòng nào khớp với bộ lọc hiện tại.
+                  <td colSpan={6} className="py-12 text-center font-bold text-text-muted">
+                    Không tìm thấy đơn đặt phòng nào khớp với bộ lọc.
                   </td>
                 </tr>
               ) : (
                 filteredBookings.map((bk) => (
                   <tr key={bk.id} className="hover:bg-bg-ivory/60 transition-colors">
                     <td className="py-4 px-4">
-                      <span className="font-serif font-bold text-base text-bg-wood-deep block">
-                        {bk.booking_code}
-                      </span>
-                      <span className="text-[11px] text-text-muted">
-                        {formatDateTimeVN(bk.created_at)}
-                      </span>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="font-semibold text-text-primary">{bk.guest_name}</div>
-                      <div className="text-xs text-text-secondary">{bk.guest_phone}</div>
-                      <div className="text-[11px] text-text-muted">{bk.guest_email}</div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="font-medium text-text-primary">{bk.room_name}</div>
-                      <div className="text-xs text-text-muted">
-                        Mã: {bk.room_code} • {bk.adults_count} người lớn
+                      <div className="font-extrabold text-base text-text-primary">
+                        {bk.guest_name}
+                      </div>
+                      <div className="text-xs font-extrabold text-brand-gold-dark mt-0.5">
+                        SĐT: {bk.guest_phone}
+                      </div>
+                      <div className="mt-2">
+                        <PhoneActions
+                          phone={bk.guest_phone}
+                          size="sm"
+                          smsBody={`Xin chào ${bk.guest_name}, Nhà Nghỉ Tha Phương xác nhận đơn đặt ${bk.room_name} ngày ${formatDateVN(bk.check_in_date)}.`}
+                        />
                       </div>
                     </td>
+
+                    <td className="py-4 px-4">
+                      <div className="font-extrabold text-base text-text-primary">
+                        {bk.room_name}
+                      </div>
+                      <div className="text-xs font-bold text-text-secondary mt-0.5">
+                        Mã: <strong>{bk.room_code}</strong> •{' '}
+                        <strong>{bk.adults_count} khách</strong>
+                      </div>
+                      <span className="text-[11px] font-semibold text-text-muted block mt-0.5">
+                        Mã đơn: {bk.booking_code}
+                      </span>
+                    </td>
+
                     <td className="py-4 px-4 text-xs text-text-secondary">
-                      <div>Nhận: <strong>{formatDateVN(bk.check_in_date)}</strong></div>
-                      <div>Trả: <strong>{formatDateVN(bk.check_out_date)}</strong></div>
-                      <span className="text-brand-gold-dark font-semibold">
+                      <div>
+                        Nhận: <strong className="text-text-primary">{formatDateVN(bk.check_in_date)}</strong>
+                      </div>
+                      <div>
+                        Trả: <strong className="text-text-primary">{formatDateVN(bk.check_out_date)}</strong>
+                      </div>
+                      <span className="text-brand-gold-dark font-extrabold">
                         ({bk.nights_count} đêm)
                       </span>
                     </td>
-                    <td className="py-4 px-4">
-                      <span className="font-serif font-bold text-base text-text-primary block">
-                        {formatVND(bk.total_amount)}
-                      </span>
-                      <StatusBadge status={bk.payment_status} className="mt-1" />
+
+                    <td className="py-4 px-4 text-xs max-w-xs">
+                      {bk.customer_notes ? (
+                        <div className="p-2.5 rounded-xl bg-brand-champagne/35 border border-brand-gold/30 font-bold text-text-primary">
+                          {bk.customer_notes}
+                        </div>
+                      ) : (
+                        <span className="text-text-muted font-medium">
+                          Nhận phòng giờ tiêu chuẩn (từ 14:00)
+                        </span>
+                      )}
                     </td>
+
                     <td className="py-4 px-4">
                       <StatusBadge status={bk.status} />
                     </td>
+
                     <td className="py-4 px-4 text-right">
                       <div className="inline-flex flex-wrap items-center justify-end gap-1.5">
+                        {bk.status === 'pending' && (
+                          <>
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              className="rounded-xl font-extrabold"
+                              onClick={() =>
+                                setPendingStatusAction({
+                                  booking: bk,
+                                  newStatus: 'confirmed',
+                                  note: 'Lễ tân đã xác nhận giữ phòng cho khách.',
+                                })
+                              }
+                            >
+                              Xác nhận
+                            </Button>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              className="rounded-xl font-extrabold"
+                              onClick={() =>
+                                setPendingStatusAction({
+                                  booking: bk,
+                                  newStatus: 'cancelled',
+                                  note: 'Đơn đặt phòng đã được hủy bỏ.',
+                                })
+                              }
+                            >
+                              Hủy
+                            </Button>
+                          </>
+                        )}
+
                         <Button
                           variant="secondary"
                           size="sm"
                           leftIcon={<Eye className="w-3.5 h-3.5" />}
+                          className="rounded-xl font-bold"
                           onClick={() => handleOpenDetail(bk)}
                         >
                           Chi tiết
@@ -348,7 +399,7 @@ export const AdminBookingsPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handlePrintBookingSlip(bk)}
-                          className="p-2 rounded-classic border border-border-default bg-bg-ivory hover:border-brand-gold text-text-secondary hover:text-text-primary"
+                          className="p-2 rounded-xl border border-border-default bg-bg-ivory hover:border-brand-gold text-text-secondary hover:text-text-primary"
                           title="In phiếu đặt phòng"
                         >
                           <Printer className="w-4 h-4" />
@@ -363,94 +414,91 @@ export const AdminBookingsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Booking Detail & Workflow Modal matching Figma Frame 6:255 */}
+      {/* Booking Detail Modal */}
       {selectedBooking && (
         <Modal
           isOpen={Boolean(selectedBooking)}
           onClose={() => setSelectedBooking(null)}
-          title={`Chi Tiết Booking: ${selectedBooking.booking_code}`}
-          subtitle={`Tạo lúc ${formatDateTimeVN(selectedBooking.created_at)}`}
-          maxWidthClass="max-w-3xl"
+          title={`Chi Tiết Đặt Phòng: ${selectedBooking.guest_name}`}
+          subtitle={`Mã đơn: ${selectedBooking.booking_code} • Đăng ký lúc ${formatDateTimeVN(selectedBooking.created_at)}`}
+          maxWidthClass="max-w-2xl"
           footer={
             <>
               <Button
                 variant="secondary"
                 leftIcon={<Printer className="w-4 h-4" />}
                 onClick={() => handlePrintBookingSlip(selectedBooking)}
+                className="rounded-xl font-bold"
               >
                 In phiếu đặt phòng
               </Button>
-              <Button variant="primary" onClick={() => setSelectedBooking(null)}>
+              <Button
+                variant="primary"
+                onClick={() => setSelectedBooking(null)}
+                className="rounded-xl font-extrabold"
+              >
                 Đóng cửa sổ
               </Button>
             </>
           }
         >
-          <div className="space-y-6 text-sm">
+          <div className="space-y-5 text-sm">
             {/* Guest & Stay Info */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-classic bg-bg-ivory border border-border-default">
-              <div>
-                <span className="text-xs uppercase tracking-wider text-text-muted block mb-1">
-                  Thông tin khách lưu trú
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-bg-ivory border border-border-default">
+              <div className="space-y-2">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-text-muted block">
+                  Thông tin khách hàng
                 </span>
-                <p className="font-serif text-lg font-bold text-text-primary">
+                <p className="font-serif text-lg font-extrabold text-text-primary">
                   {selectedBooking.guest_name}
                 </p>
-                <p className="text-text-secondary mt-1">
-                  Điện thoại:{' '}
-                  <a
-                    href={`tel:${selectedBooking.guest_phone}`}
-                    className="font-semibold text-brand-gold-dark underline"
-                  >
-                    {selectedBooking.guest_phone}
-                  </a>
+                <p className="font-bold text-brand-gold-dark">
+                  SĐT: {selectedBooking.guest_phone}
                 </p>
-                <p className="text-text-secondary">Email: {selectedBooking.guest_email}</p>
-                {selectedBooking.customer_notes && (
-                  <p className="text-xs text-text-secondary mt-2 pt-2 border-t border-border-default">
-                    <strong>Ghi chú của khách:</strong> {selectedBooking.customer_notes}
-                  </p>
-                )}
+                <PhoneActions
+                  phone={selectedBooking.guest_phone}
+                  size="sm"
+                  smsBody={`Xin chào ${selectedBooking.guest_name}, Nhà Nghỉ Tha Phương liên hệ về đơn đặt ${selectedBooking.room_name}.`}
+                />
               </div>
 
-              <div>
-                <span className="text-xs uppercase tracking-wider text-text-muted block mb-1">
-                  Thông tin phòng & Thanh toán
+              <div className="space-y-1.5">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-text-muted block">
+                  Phòng &amp; Thời gian nhận phòng
                 </span>
-                <p className="font-serif text-lg font-bold text-text-primary">
+                <p className="font-serif text-lg font-extrabold text-text-primary">
                   {selectedBooking.room_name} ({selectedBooking.room_code})
                 </p>
-                <p className="text-text-secondary mt-1">
+                <p className="text-text-secondary font-semibold">
                   Nhận: <strong>{formatDateVN(selectedBooking.check_in_date)}</strong> → Trả:{' '}
                   <strong>{formatDateVN(selectedBooking.check_out_date)}</strong> (
                   {selectedBooking.nights_count} đêm)
                 </p>
-                <p className="text-text-secondary">
-                  Tổng tiền:{' '}
-                  <strong className="font-serif text-lg text-bg-wood-deep">
-                    {formatVND(selectedBooking.total_amount)}
-                  </strong>
+                <p className="text-text-secondary font-semibold">
+                  Số khách: <strong>{selectedBooking.adults_count} người</strong>
                 </p>
-                <div className="flex items-center gap-2 mt-2">
+                <div className="pt-1">
                   <StatusBadge status={selectedBooking.status} />
-                  <StatusBadge status={selectedBooking.payment_status} />
                 </div>
               </div>
             </div>
 
-            {/* Workflow Status Actions */}
-            <div className="p-4 rounded-classic bg-bg-cream/60 border border-border-default space-y-3">
-              <span className="text-xs font-semibold uppercase tracking-wider text-text-primary block">
-                Cập nhật trạng thái xử lý Booking
-              </span>
+            {selectedBooking.customer_notes && (
+              <div className="p-4 rounded-2xl bg-brand-champagne/40 border border-brand-gold/40">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-bg-wood-deep block mb-1">
+                  Giờ nhận phòng dự kiến &amp; Ghi chú của khách:
+                </span>
+                <p className="font-extrabold text-text-primary">
+                  {selectedBooking.customer_notes}
+                </p>
+              </div>
+            )}
 
-              <input
-                type="text"
-                placeholder="Nhập ghi chú lý do chuyển trạng thái (tùy chọn)..."
-                value={statusChangeNote}
-                onChange={(e) => setStatusChangeNote(e.target.value)}
-                className="w-full h-9 px-3 rounded-classic bg-bg-ivory-white border border-border-default text-xs"
-              />
+            {/* Workflow Status Actions (Each opens ConfirmDialog) */}
+            <div className="p-4 rounded-2xl bg-bg-cream/60 border border-border-default space-y-3">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-text-primary block">
+                Cập nhật trạng thái đơn đặt phòng (Có bước xác nhận an toàn)
+              </span>
 
               <div className="flex flex-wrap items-center gap-2.5">
                 <Button
@@ -458,31 +506,32 @@ export const AdminBookingsPage: React.FC = () => {
                   size="sm"
                   disabled={selectedBooking.status === 'confirmed'}
                   leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
+                  className="rounded-xl font-extrabold"
                   onClick={() =>
-                    handleUpdateStatus(
-                      selectedBooking.id,
-                      'confirmed',
-                      'Lễ tân đã xác nhận giữ phòng cho khách.'
-                    )
+                    setPendingStatusAction({
+                      booking: selectedBooking,
+                      newStatus: 'confirmed',
+                      note: 'Lễ tân đã xác nhận giữ phòng cho khách.',
+                    })
                   }
                 >
-                  Xác nhận Booking
+                  Xác nhận Giữ phòng
                 </Button>
 
                 <Button
                   variant="dark"
                   size="sm"
                   disabled={selectedBooking.status === 'completed'}
+                  className="rounded-xl font-extrabold"
                   onClick={() =>
-                    handleUpdateStatus(
-                      selectedBooking.id,
-                      'completed',
-                      'Khách đã nhận phòng, thanh toán trực tiếp tại lễ tân và hoàn tất lưu trú.',
-                      'paid'
-                    )
+                    setPendingStatusAction({
+                      booking: selectedBooking,
+                      newStatus: 'completed',
+                      note: 'Khách đã nhận phòng và hoàn tất lưu trú.',
+                    })
                   }
                 >
-                  Đánh dấu Hoàn thành (Đã thu tiền)
+                  Khách đã nhận phòng (Hoàn tất)
                 </Button>
 
                 <Button
@@ -490,15 +539,16 @@ export const AdminBookingsPage: React.FC = () => {
                   size="sm"
                   disabled={selectedBooking.status === 'cancelled'}
                   leftIcon={<XCircle className="w-3.5 h-3.5" />}
+                  className="rounded-xl font-extrabold"
                   onClick={() =>
-                    handleUpdateStatus(
-                      selectedBooking.id,
-                      'cancelled',
-                      'Đơn đặt phòng đã bị hủy / từ chối bởi Quản trị viên.'
-                    )
+                    setPendingStatusAction({
+                      booking: selectedBooking,
+                      newStatus: 'cancelled',
+                      note: 'Đơn đặt phòng đã bị hủy bởi Quản trị viên.',
+                    })
                   }
                 >
-                  Hủy / Từ chối Booking
+                  Hủy đơn đặt phòng
                 </Button>
               </div>
             </div>
@@ -506,15 +556,15 @@ export const AdminBookingsPage: React.FC = () => {
             {/* Internal Admin Notes */}
             <div className="space-y-2">
               <TextAreaField
-                label="Ghi chú nội bộ dành cho Lễ tân / Chủ nhà (Khách hàng không nhìn thấy)"
+                label="Ghi chú riêng của Chủ nhà (Chỉ Admin thấy)"
                 rows={2}
-                placeholder="Ví dụ: Khách quen, dự kiến nhận phòng lúc 19:30..."
+                placeholder="Ví dụ: Đã gọi điện xác nhận, khách hẹn 18:00 tới nhận phòng..."
                 value={internalNotesDraft}
                 onChange={(e) => setInternalNotesDraft(e.target.value)}
               />
               <div className="flex items-center justify-between">
                 {notesSavedToast ? (
-                  <span className="text-xs text-state-success font-medium">
+                  <span className="text-xs text-state-success font-extrabold">
                     ✓ Đã lưu ghi chú nội bộ
                   </span>
                 ) : (
@@ -526,29 +576,30 @@ export const AdminBookingsPage: React.FC = () => {
                   size="sm"
                   leftIcon={<Save className="w-3.5 h-3.5" />}
                   onClick={handleSaveInternalNotes}
+                  className="rounded-xl font-bold"
                 >
-                  Lưu ghi chú nội bộ
+                  Lưu ghi chú
                 </Button>
               </div>
             </div>
 
             {/* Booking Status History */}
             <div className="pt-4 border-t border-border-default">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-3 flex items-center gap-1.5">
+              <h4 className="text-xs font-extrabold uppercase tracking-wider text-text-muted mb-3 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-brand-gold-dark" />
-                Lịch sử thay đổi trạng thái ({selectedHistory.length})
+                Lịch sử thao tác ({selectedHistory.length})
               </h4>
-              <div className="space-y-2 max-h-44 overflow-y-auto">
+              <div className="space-y-2 max-h-40 overflow-y-auto">
                 {selectedHistory.map((h) => (
                   <div
                     key={h.id}
-                    className="p-3 rounded-classic bg-bg-ivory border border-border-default text-xs flex items-start justify-between gap-4"
+                    className="p-3 rounded-xl bg-bg-ivory border border-border-default text-xs flex items-start justify-between gap-4"
                   >
                     <div>
                       <StatusBadge status={h.new_status} />
-                      <p className="text-text-secondary mt-1">{h.note}</p>
+                      <p className="font-semibold text-text-secondary mt-1">{h.note}</p>
                     </div>
-                    <span className="text-[11px] text-text-muted shrink-0">
+                    <span className="text-[11px] font-semibold text-text-muted shrink-0">
                       {formatDateTimeVN(h.created_at)}
                     </span>
                   </div>
@@ -558,6 +609,60 @@ export const AdminBookingsPage: React.FC = () => {
           </div>
         </Modal>
       )}
+
+      {/* Confirmation Dialog for Status Changes */}
+      <ConfirmDialog
+        isOpen={Boolean(pendingStatusAction)}
+        title={
+          pendingStatusAction?.newStatus === 'confirmed'
+            ? 'Xác nhận giữ phòng cho khách?'
+            : pendingStatusAction?.newStatus === 'completed'
+            ? 'Xác nhận khách đã nhận phòng?'
+            : 'Xác nhận HỦY bỏ đơn đặt phòng này?'
+        }
+        description="Vui lòng kiểm tra lại thông tin khách hàng một lần nữa để tránh nhầm lẫn:"
+        confirmText={
+          pendingStatusAction?.newStatus === 'cancelled'
+            ? 'Đồng ý Hủy đơn'
+            : 'Đồng ý Xác nhận'
+        }
+        cancelText="Quay lại"
+        variant={
+          pendingStatusAction?.newStatus === 'cancelled' ? 'danger' : 'confirm'
+        }
+        details={
+          pendingStatusAction
+            ? [
+                {
+                  label: 'Khách hàng',
+                  value: pendingStatusAction.booking.guest_name,
+                },
+                {
+                  label: 'Số điện thoại',
+                  value: pendingStatusAction.booking.guest_phone,
+                },
+                {
+                  label: 'Loại phòng',
+                  value: pendingStatusAction.booking.room_name || '',
+                },
+                {
+                  label: 'Ngày nhận phòng',
+                  value: `${formatDateVN(pendingStatusAction.booking.check_in_date)} (${pendingStatusAction.booking.nights_count} đêm)`,
+                },
+                ...(pendingStatusAction.booking.customer_notes
+                  ? [
+                      {
+                        label: 'Giờ nhận & Ghi chú',
+                        value: pendingStatusAction.booking.customer_notes,
+                      },
+                    ]
+                  : []),
+              ]
+            : []
+        }
+        onConfirm={handleConfirmStatusUpdate}
+        onCancel={() => setPendingStatusAction(null)}
+      />
     </div>
   );
 };

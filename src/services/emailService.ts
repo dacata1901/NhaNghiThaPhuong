@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { formatDateVN, formatVND } from '@/lib/utils';
+import { formatDateVN } from '@/lib/utils';
 import type { Booking, ContactMessage } from '@/types';
 
 export const DEFAULT_TEST_NOTIFICATION_EMAIL = 'minhkhang19012006@gmail.com';
@@ -22,11 +22,12 @@ export async function sendContactNotificationEmail(
   recipientEmail: string = DEFAULT_TEST_NOTIFICATION_EMAIL
 ): Promise<EmailSendResult> {
   const targetEmail = (recipientEmail || DEFAULT_TEST_NOTIFICATION_EMAIL).trim();
+  const cleanPhone = contact.phone.replace(/\s+/g, '');
 
   const htmlContent = `
-    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 1px solid #E0D5C2; border-radius: 12px; overflow: hidden; background-color: #FFFDF8;">
+    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 1px solid #E0D5C2; border-radius: 16px; overflow: hidden; background-color: #FFFDF8;">
       <div style="background-color: #30251F; color: #F8F5EF; padding: 20px 24px;">
-        <p style="margin: 0; font-size: 12px; color: #E6D8B8; font-weight: bold; letter-spacing: 0.5px;">NHÀ NGHỈ THA PHƯƠNG • TIN NHẮN KHÁCH HÀNG</p>
+        <p style="margin: 0; font-size: 12px; color: #E6D8B8; font-weight: bold;">NHÀ NGHỈ THA PHƯƠNG • TIN NHẮN KHÁCH HÀNG</p>
         <h2 style="margin: 6px 0 0; font-size: 20px; color: #FFFFFF;">Xin chào, có tin nhắn mới từ khách hàng!</h2>
       </div>
       <div style="padding: 24px; color: #221C18; font-size: 15px; line-height: 1.6;">
@@ -38,7 +39,8 @@ export async function sendContactNotificationEmail(
           <tr>
             <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; color: #6E5F52;">Số điện thoại:</td>
             <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; font-weight: bold;">
-              <a href="tel:${contact.phone}" style="color: #8C7348; text-decoration: none;">${contact.phone}</a>
+              <a href="tel:${cleanPhone}" style="color: #4F7A5A; text-decoration: none; margin-right: 12px;">📞 Gọi: ${contact.phone}</a>
+              <a href="sms:${cleanPhone}" style="color: #8C7348; text-decoration: none;">💬 Nhắn SMS</a>
             </td>
           </tr>
           <tr>
@@ -46,9 +48,9 @@ export async function sendContactNotificationEmail(
             <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA;">${new Date(contact.created_at).toLocaleString('vi-VN')}</td>
           </tr>
         </table>
-        <div style="margin-top: 18px; padding: 16px; background-color: #F8F5EF; border-left: 4px solid #B69A68; border-radius: 8px;">
+        <div style="margin-top: 18px; padding: 16px; background-color: #F8F5EF; border-left: 4px solid #B69A68; border-radius: 10px;">
           <p style="margin: 0 0 6px; font-size: 12px; color: #6E5F52; font-weight: bold;">NỘI DUNG TIN NHẮN:</p>
-          <p style="margin: 0; font-size: 15px; color: #221C18; white-space: pre-wrap;">${contact.message}</p>
+          <p style="margin: 0; font-size: 15px; color: #221C18; white-space: pre-wrap; font-weight: 600;">${contact.message}</p>
         </div>
       </div>
       <div style="background-color: #F8F5EF; padding: 12px 24px; text-align: center; font-size: 12px; color: #6E5F52; border-top: 1px solid #E0D5C2;">
@@ -110,57 +112,45 @@ export async function sendContactNotificationEmail(
 }
 
 /**
- * Send new booking notification to host email via Resend Email API (100% Vietnamese HTML)
+ * Send new booking notification to host email via Resend Email API (100% Vietnamese HTML, no fake prices)
  */
 export async function sendBookingNotificationEmail(
   booking: Booking,
   recipientEmail: string = DEFAULT_TEST_NOTIFICATION_EMAIL
 ): Promise<EmailSendResult> {
   const targetEmail = (recipientEmail || DEFAULT_TEST_NOTIFICATION_EMAIL).trim();
+  const cleanPhone = booking.guest_phone.replace(/\s+/g, '');
 
   const htmlContent = `
-    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 1px solid #E0D5C2; border-radius: 12px; overflow: hidden; background-color: #FFFDF8;">
+    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 1px solid #E0D5C2; border-radius: 16px; overflow: hidden; background-color: #FFFDF8;">
       <div style="background-color: #30251F; color: #F8F5EF; padding: 20px 24px;">
-        <p style="margin: 0; font-size: 12px; color: #E6D8B8; font-weight: bold; letter-spacing: 0.5px;">NHÀ NGHỈ THA PHƯƠNG • ĐƠN ĐẶT PHÒNG MỚI</p>
-        <h2 style="margin: 6px 0 0; font-size: 20px; color: #FFFFFF;">Xin chào, có đơn đặt phòng mới: ${booking.booking_code}</h2>
+        <p style="margin: 0; font-size: 12px; color: #E6D8B8; font-weight: bold;">NHÀ NGHỈ THA PHƯƠNG • KHÁCH ĐĂNG KÝ ĐẶT PHÒNG</p>
+        <h2 style="margin: 6px 0 0; font-size: 20px; color: #FFFFFF;">Khách hàng ${booking.guest_name} muốn đặt phòng!</h2>
       </div>
       <div style="padding: 24px; color: #221C18; font-size: 15px; line-height: 1.6;">
         <table style="width: 100%; border-collapse: collapse;">
           <tr>
-            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; color: #6E5F52; width: 160px;">Mã đặt phòng:</td>
-            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; font-weight: bold; color: #8C7348; font-size: 16px;">${booking.booking_code}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; color: #6E5F52;">Khách đặt phòng:</td>
-            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; font-weight: bold;">${booking.guest_name}</td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; color: #6E5F52; width: 160px;">Khách đặt phòng:</td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; font-weight: bold; font-size: 16px;">${booking.guest_name}</td>
           </tr>
           <tr>
             <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; color: #6E5F52;">Số điện thoại:</td>
             <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; font-weight: bold;">
-              <a href="tel:${booking.guest_phone}" style="color: #8C7348; text-decoration: none;">${booking.guest_phone}</a>
+              <a href="tel:${cleanPhone}" style="color: #4F7A5A; text-decoration: none; margin-right: 12px;">📞 Gọi: ${booking.guest_phone}</a>
+              <a href="sms:${cleanPhone}" style="color: #8C7348; text-decoration: none;">💬 Nhắn SMS</a>
             </td>
           </tr>
           <tr>
-            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; color: #6E5F52;">Phòng đã chọn:</td>
-            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; font-weight: bold;">${booking.room_name} (${booking.room_code})</td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; color: #6E5F52;">Phòng muốn đặt:</td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; font-weight: bold; color: #8C7348; font-size: 16px;">${booking.room_name} (${booking.room_code})</td>
           </tr>
           <tr>
             <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; color: #6E5F52;">Ngày nhận phòng:</td>
-            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA;">${formatDateVN(booking.check_in_date)}</td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; font-weight: bold;">${formatDateVN(booking.check_in_date)} (${booking.nights_count} đêm)</td>
           </tr>
           <tr>
-            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; color: #6E5F52;">Ngày trả phòng:</td>
-            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA;">${formatDateVN(booking.check_out_date)} (${booking.nights_count} đêm)</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; color: #6E5F52;">Tổng thanh toán:</td>
-            <td style="padding: 8px 0; border-bottom: 1px solid #EFE8DA; font-weight: bold; color: #8C7348; font-size: 17px;">
-              ${formatVND(booking.total_amount)} (Thu tại lễ tân)
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 8px 0; color: #6E5F52;">Ghi chú của khách:</td>
-            <td style="padding: 8px 0;">${booking.customer_notes || 'Không có'}</td>
+            <td style="padding: 8px 0; color: #6E5F52;">Giờ nhận & Ghi chú:</td>
+            <td style="padding: 8px 0; font-weight: bold; color: #4F7A5A;">${booking.customer_notes || 'Không có ghi chú'}</td>
           </tr>
         </table>
       </div>
@@ -180,7 +170,7 @@ export async function sendBookingNotificationEmail(
       body: JSON.stringify({
         from: 'Nhà Nghỉ Tha Phương <onboarding@resend.dev>',
         to: [targetEmail],
-        subject: `[Nhà Nghỉ Tha Phương] Đặt phòng mới ${booking.booking_code} - ${booking.guest_name} (${booking.guest_phone})`,
+        subject: `[Nhà Nghỉ Tha Phương] Khách ${booking.guest_name} (${booking.guest_phone}) đặt ${booking.room_name}`,
         html: htmlContent,
       }),
     });

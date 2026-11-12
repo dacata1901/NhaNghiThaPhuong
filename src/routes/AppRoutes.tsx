@@ -1,20 +1,18 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { PublicLayout } from '@/layouts/PublicLayout';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { HomePage } from '@/pages/public/HomePage';
 import { RoomListPage } from '@/pages/public/RoomListPage';
 import { RoomDetailPage } from '@/pages/public/RoomDetailPage';
 import { BookingPage } from '@/pages/public/BookingPage';
-import { BookingLookupPage } from '@/pages/public/BookingLookupPage';
 import { AboutPage } from '@/pages/public/AboutPage';
 import { ContactPage } from '@/pages/public/ContactPage';
 import { FaqPage } from '@/pages/public/FaqPage';
 import { PolicyPage } from '@/pages/public/PolicyPage';
 import { NotFoundPage } from '@/pages/public/NotFoundPage';
-import { DesignSystemPage } from '@/pages/public/DesignSystemPage';
 
-// Admin Dashboard Pages (Phase 4)
+// Admin Dashboard Pages
 import { AdminLoginPage } from '@/pages/admin/AdminLoginPage';
 import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
 import { AdminRoomsPage } from '@/pages/admin/AdminRoomsPage';
@@ -44,7 +42,9 @@ export const AppRoutes: React.FC = () => {
           <Route path="/rooms" element={<RoomListPage />} />
           <Route path="/rooms/:slug" element={<RoomDetailPage />} />
           <Route path="/booking" element={<BookingPage />} />
-          <Route path="/booking-lookup" element={<BookingLookupPage />} />
+          {/* Redirect removed pages cleanly */}
+          <Route path="/booking-lookup" element={<Navigate to="/booking" replace />} />
+          <Route path="/design-system" element={<Navigate to="/" replace />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/faq" element={<FaqPage />} />
@@ -61,7 +61,6 @@ export const AppRoutes: React.FC = () => {
             element={<PolicyPage policyType="privacy-policy" />}
           />
           <Route path="/terms" element={<PolicyPage policyType="terms" />} />
-          <Route path="/design-system" element={<DesignSystemPage />} />
           <Route path="/404" element={<NotFoundPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
@@ -69,7 +68,7 @@ export const AppRoutes: React.FC = () => {
         {/* Admin Authentication Route */}
         <Route path="/admin/login" element={<AdminLoginPage />} />
 
-        {/* Protected Admin Dashboard Routes (Phase 4 Completed) */}
+        {/* Protected Admin Dashboard Routes */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboardPage />} />
           <Route path="bookings" element={<AdminBookingsPage />} />

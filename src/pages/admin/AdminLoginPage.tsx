@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { Lock, Mail, ShieldCheck, ArrowLeft, KeyRound, AlertCircle } from 'lucide-react';
+import {
+  Lock,
+  Mail,
+  ShieldCheck,
+  ArrowLeft,
+  Zap,
+  AlertCircle,
+} from 'lucide-react';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import { SEOHead } from '@/components/common/SEOHead';
 import { Button } from '@/components/ui/Button';
@@ -11,8 +18,8 @@ export const AdminLoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [email, setEmail] = useState('huynhduykhanh0406@gmail.com');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('minhkhang19012006@gmail.com');
+  const [password, setPassword] = useState('ThaPhuong@2026');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,10 +48,14 @@ export const AdminLoginPage: React.FC = () => {
     navigate(fromPath, { replace: true });
   };
 
-  const handleQuickFillDemo = () => {
-    setEmail('huynhduykhanh0406@gmail.com');
-    setPassword('ThaPhuong@2026');
+  const handleInstantLogin = async () => {
     setError(null);
+    setIsLoading(true);
+    const res = await login('huynhduykhanh0406@gmail.com', 'ThaPhuong@2026');
+    setIsLoading(false);
+    if (res.success) {
+      navigate(fromPath, { replace: true });
+    }
   };
 
   return (
@@ -57,30 +68,42 @@ export const AdminLoginPage: React.FC = () => {
       />
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-classic bg-brand-gold/20 border border-brand-gold text-brand-gold-light flex items-center justify-center mx-auto mb-3 font-serif text-lg font-bold tracking-widest">
+        <div className="text-center mb-7">
+          <div className="w-12 h-12 rounded-2xl bg-brand-gold/20 border border-brand-gold text-brand-gold-light flex items-center justify-center mx-auto mb-3 font-serif text-lg font-extrabold tracking-widest">
             TP
           </div>
-          <span className="text-xs uppercase tracking-[0.24em] text-brand-gold-light block">
-            INTERNAL MANAGEMENT PORTAL
+          <span className="text-xs font-extrabold uppercase tracking-[0.2em] text-brand-gold-light block">
+            HỆ THỐNG QUẢN LÝ CHỦ NHÀ
           </span>
-          <h1 className="font-serif text-3xl font-bold text-text-on-dark mt-1">
+          <h1 className="font-serif text-3xl font-extrabold text-text-on-dark mt-1">
             Quản Trị Nhà Nghỉ Tha Phương
           </h1>
-          <p className="text-xs text-text-on-dark/70 mt-2">
-            Hệ thống bảo mật nội bộ – Không cho phép tự đăng ký tài khoản công khai
-          </p>
         </div>
 
-        <div className="bg-bg-ivory-white border border-border-strong rounded-classic p-6 sm:p-8 shadow-luxury-lg text-text-primary">
+        <div className="bg-bg-ivory-white border border-border-strong rounded-3xl p-6 sm:p-8 shadow-luxury-lg text-text-primary space-y-5">
+          {/* Nút vào nhanh 1 chạm cho Chủ nhà */}
+          <div className="p-4 rounded-2xl bg-brand-champagne/40 border border-brand-gold/40 space-y-2.5">
+            <span className="text-xs font-extrabold text-bg-wood-deep block">
+              Chuyển nhanh dành cho Chủ Nhà:
+            </span>
+            <button
+              type="button"
+              onClick={handleInstantLogin}
+              className="w-full py-3 px-4 rounded-xl bg-bg-wood-deep text-brand-gold-light hover:bg-brand-gold hover:text-text-on-dark font-extrabold text-sm flex items-center justify-center gap-2 transition-all shadow-sm"
+            >
+              <Zap className="w-4 h-4" />
+              Vào Ngay Trang Quản Trị (1 Chạm)
+            </button>
+          </div>
+
           {error && (
-            <div className="mb-5 p-3.5 rounded-classic bg-state-danger/10 border border-state-danger/30 text-state-danger text-xs flex items-start gap-2.5">
+            <div className="p-3.5 rounded-xl bg-state-danger/10 border border-state-danger/30 text-state-danger text-xs font-bold flex items-start gap-2.5">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <InputField
               label="Email Quản trị viên"
               type="email"
@@ -88,7 +111,6 @@ export const AdminLoginPage: React.FC = () => {
               leftIcon={<Mail className="w-4 h-4" />}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="huynhduykhanh0406@gmail.com"
             />
 
             <InputField
@@ -98,7 +120,6 @@ export const AdminLoginPage: React.FC = () => {
               leftIcon={<Lock className="w-4 h-4" />}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Nhập mật khẩu quản trị..."
             />
 
             <Button
@@ -107,46 +128,23 @@ export const AdminLoginPage: React.FC = () => {
               size="lg"
               fullWidth
               isLoading={isLoading}
+              className="rounded-xl font-extrabold"
             >
-              Đăng nhập hệ thống quản trị
+              Đăng Nhập Quản Trị
             </Button>
           </form>
 
-          {/* Quick-fill helper for owner testing */}
-          <div className="mt-6 pt-5 border-t border-border-default">
-            <div className="p-3.5 rounded-classic bg-bg-cream/70 border border-border-default text-xs space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-semibold text-text-primary flex items-center gap-1.5">
-                  <KeyRound className="w-3.5 h-3.5 text-brand-gold-dark" />
-                  Tài khoản Chủ nhà mặc định:
-                </span>
-                <button
-                  type="button"
-                  onClick={handleQuickFillDemo}
-                  className="px-2.5 py-1 rounded-classic bg-brand-gold text-text-on-dark font-medium hover:bg-brand-gold-dark transition-colors"
-                >
-                  Điền nhanh mật khẩu
-                </button>
-              </div>
-              <p className="text-text-secondary">
-                Email: <code className="text-text-primary font-semibold">huynhduykhanh0406@gmail.com</code>
-                <br />
-                Mật khẩu: <code className="text-text-primary font-semibold">ThaPhuong@2026</code>
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-6 flex items-center justify-between text-xs text-text-secondary">
+          <div className="pt-4 border-t border-border-default flex items-center justify-between text-xs font-bold text-text-secondary">
             <Link
               to="/"
-              className="inline-flex items-center gap-1.5 hover:text-brand-gold-dark font-medium"
+              className="inline-flex items-center gap-1.5 hover:text-brand-gold-dark font-extrabold"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              Quay về trang chủ khách hàng
+              Chuyển về Giao diện Khách (User)
             </Link>
-            <span className="inline-flex items-center gap-1 text-state-success">
+            <span className="inline-flex items-center gap-1 text-state-success font-extrabold">
               <ShieldCheck className="w-3.5 h-3.5" />
-              Bảo mật RLS
+              Bảo mật
             </span>
           </div>
         </div>

@@ -1,204 +1,228 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import dayjs from 'dayjs';
 import {
   CalendarCheck,
-  BedDouble,
   Clock,
   CheckCircle2,
-  TrendingUp,
+  MessageSquare,
   Plus,
+  Check,
+  XCircle,
+  ArrowLeftRight,
 } from 'lucide-react';
 import { useHotelData } from '@/context/HotelDataContext';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Button } from '@/components/ui/Button';
-import { formatVND, formatDateVN } from '@/lib/utils';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { PhoneActions } from '@/components/ui/PhoneActions';
+import { formatDateVN } from '@/lib/utils';
+import type { Booking, BookingStatus } from '@/types';
 
 export const AdminDashboardPage: React.FC = () => {
-  const {
-    rooms,
-    bookings,
-    updateBookingStatus,
-    getAvailableQuantityForRoom,
-  } = useHotelData();
+  const { bookings, contactMessages, updateBookingStatus } = useHotelData();
+
+  const [pendingAction, setPendingAction] = useState<{
+    booking: Booking;
+    newStatus: BookingStatus;
+  } | null>(null);
 
   const stats = useMemo(() => {
-    const validBookings = bookings.filter(
-      (b) => b.status === 'confirmed' || b.status === 'completed'
-    );
-    const totalRevenue = validBookings.reduce((sum, b) => sum + b.total_amount, 0);
-
     const pendingCount = bookings.filter((b) => b.status === 'pending').length;
     const confirmedCount = bookings.filter((b) => b.status === 'confirmed').length;
-
-    const totalRoomsPhysical = rooms.reduce((sum, r) => sum + r.total_quantity, 0);
-    const todayStr = dayjs().format('YYYY-MM-DD');
-    const tomorrowStr = dayjs().add(1, 'day').format('YYYY-MM-DD');
-
-    const availableRoomsToday = rooms.reduce(
-      (sum, r) => sum + getAvailableQuantityForRoom(r.id, todayStr, tomorrowStr),
-      0
-    );
+    const unreadMessages = contactMessages.filter((m) => m.status === 'unread').length;
 
     return {
-      totalRevenue,
       pendingCount,
       confirmedCount,
-      totalRoomsPhysical,
-      availableRoomsToday,
+      totalBookings: bookings.length,
+      unreadMessages,
     };
-  }, [rooms, bookings, getAvailableQuantityForRoom]);
+  }, [bookings, contactMessages]);
+
+  const handleConfirmAction = () => {
+    if (!pendingAction) return;
+    const { booking, newStatus } = pendingAction;
+    updateBookingStatus(
+      booking.id,
+      newStatus,
+      newStatus === 'confirmed'
+        ? 'Chủ nhà đã xác nhận giữ phòng cho khách.'
+        : 'Chủ nhà đã hủy đơn đặt phòng.'
+    );
+    setPendingAction(null);
+  };
 
   return (
     <div className="space-y-6">
-      {/* Simple Top Bar */}
-      <div className="bg-bg-ivory-white border border-border-default rounded-classic p-5 shadow-luxury-sm flex flex-wrap items-center justify-between gap-4">
+      {/* Top Bar */}
+      <div className="bg-bg-ivory-white border border-border-default rounded-2xl p-6 shadow-luxury-sm flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-text-primary">
-            Bảng Theo Dõi Nhanh Cho Chủ Nhà
+          <h2 className="text-xl sm:text-2xl font-extrabold text-text-primary">
+            Bảng Theo Dõi Đặt Phòng Cho Chủ Nhà
           </h2>
-          <p className="text-xs text-text-secondary mt-0.5">
-            Quản lý nhanh đơn đặt phòng mới và tình trạng phòng trống trong ngày.
+          <p className="text-xs sm:text-sm font-medium text-text-secondary mt-1">
+            Xem nhanh <strong>Khách hàng nào</strong> muốn đặt <strong>Phòng nào</strong>,{' '}
+            <strong>Giờ nhận phòng</strong> và bấm gọi điện / nhắn SMS xác nhận ngay.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
+          <Link to="/">
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<ArrowLeftRight className="w-3.5 h-3.5" />}
+              className="rounded-xl font-extrabold"
+            >
+              Xem Giao Diện Khách
+            </Button>
+          </Link>
           <Link to="/admin/rooms">
-            <Button variant="secondary" size="sm" leftIcon={<Plus className="w-3.5 h-3.5" />}>
-              Quản lý phòng &amp; ảnh
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<Plus className="w-3.5 h-3.5" />}
+              className="rounded-xl font-extrabold"
+            >
+              Quản lý Loại Phòng
             </Button>
           </Link>
           <Link to="/admin/bookings">
-            <Button variant="primary" size="sm">
-              Xem tất cả đặt phòng ({bookings.length})
+            <Button variant="primary" size="sm" className="rounded-xl font-extrabold">
+              Tất cả đơn đặt phòng ({bookings.length})
             </Button>
           </Link>
         </div>
       </div>
 
-      {/* 4 Core KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-bg-ivory-white border border-border-default rounded-classic p-5 shadow-luxury-sm">
-          <div className="flex items-center justify-between text-xs font-semibold text-text-secondary mb-2">
+      {/* 3 Simple KPI Cards (No Price / No Available Room Counter) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-bg-ivory-white border border-border-default rounded-2xl p-5 shadow-luxury-sm">
+          <div className="flex items-center justify-between text-xs font-extrabold text-text-secondary mb-2 uppercase tracking-wider">
             <span>Đơn chờ xác nhận</span>
-            <Clock className="w-4 h-4 text-state-warning" />
+            <Clock className="w-5 h-5 text-state-warning" />
           </div>
-          <p className="text-3xl font-bold text-state-warning">
-            {stats.pendingCount} đơn
+          <p className="text-3xl font-extrabold text-state-warning">
+            {stats.pendingCount} đơn mới
           </p>
-          <p className="text-xs text-text-muted mt-1">
-            Cần gọi xác nhận với khách
+          <p className="text-xs font-semibold text-text-muted mt-1">
+            Cần bấm Gọi điện hoặc Nhắn SMS xác nhận với khách
           </p>
         </div>
 
-        <div className="bg-bg-ivory-white border border-border-default rounded-classic p-5 shadow-luxury-sm">
-          <div className="flex items-center justify-between text-xs font-semibold text-text-secondary mb-2">
-            <span>Đơn đã xác nhận</span>
-            <CheckCircle2 className="w-4 h-4 text-state-success" />
+        <div className="bg-bg-ivory-white border border-border-default rounded-2xl p-5 shadow-luxury-sm">
+          <div className="flex items-center justify-between text-xs font-extrabold text-text-secondary mb-2 uppercase tracking-wider">
+            <span>Đơn đã xác nhận giữ phòng</span>
+            <CheckCircle2 className="w-5 h-5 text-state-success" />
           </div>
-          <p className="text-3xl font-bold text-state-success">
+          <p className="text-3xl font-extrabold text-state-success">
             {stats.confirmedCount} đơn
           </p>
-          <p className="text-xs text-text-muted mt-1">
-            Đã giữ phòng cho khách
+          <p className="text-xs font-semibold text-text-muted mt-1">
+            Đã hẹn giờ đón khách nhận phòng
           </p>
         </div>
 
-        <div className="bg-bg-ivory-white border border-border-default rounded-classic p-5 shadow-luxury-sm">
-          <div className="flex items-center justify-between text-xs font-semibold text-text-secondary mb-2">
-            <span>Phòng trống hôm nay</span>
-            <BedDouble className="w-4 h-4 text-brand-gold-dark" />
+        <div className="bg-bg-ivory-white border border-border-default rounded-2xl p-5 shadow-luxury-sm">
+          <div className="flex items-center justify-between text-xs font-extrabold text-text-secondary mb-2 uppercase tracking-wider">
+            <span>Tin nhắn khách hỏi</span>
+            <MessageSquare className="w-5 h-5 text-brand-gold-dark" />
           </div>
-          <p className="text-3xl font-bold text-text-primary">
-            {stats.availableRoomsToday} / {stats.totalRoomsPhysical}
+          <p className="text-3xl font-extrabold text-text-primary">
+            {stats.unreadMessages} tin mới
           </p>
-          <p className="text-xs text-text-muted mt-1">
-            Tổng số phòng sẵn sàng đón khách
-          </p>
-        </div>
-
-        <div className="bg-bg-ivory-white border border-border-default rounded-classic p-5 shadow-luxury-sm">
-          <div className="flex items-center justify-between text-xs font-semibold text-text-secondary mb-2">
-            <span>Tổng tiền đơn xác nhận</span>
-            <TrendingUp className="w-4 h-4 text-brand-gold-dark" />
-          </div>
-          <p className="text-2xl sm:text-3xl font-bold text-bg-wood-deep">
-            {formatVND(stats.totalRevenue)}
-          </p>
-          <p className="text-xs text-text-muted mt-1">
-            Thu trực tiếp khi khách nhận phòng
+          <p className="text-xs font-semibold text-text-muted mt-1">
+            Tổng cộng {contactMessages.length} tin nhắn từ khách hàng
           </p>
         </div>
       </div>
 
-      {/* Recent Bookings Table with Quick Confirm/Cancel */}
-      <div className="bg-bg-ivory-white border border-border-default rounded-classic p-5 sm:p-6 shadow-luxury-sm">
+      {/* Recent Bookings Table with Call/SMS & ConfirmDialog */}
+      <div className="bg-bg-ivory-white border border-border-default rounded-2xl p-5 sm:p-6 shadow-luxury-sm">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-          <h3 className="text-lg font-bold text-text-primary flex items-center gap-2">
+          <h3 className="text-lg font-extrabold text-text-primary flex items-center gap-2">
             <CalendarCheck className="w-5 h-5 text-brand-gold-dark" />
-            Danh sách đơn đặt phòng mới nhất
+            Danh sách khách đăng ký đặt phòng mới nhất
           </h3>
           <Link
             to="/admin/bookings"
-            className="text-xs font-semibold text-brand-gold-dark hover:underline"
+            className="text-xs font-extrabold text-brand-gold-dark hover:underline"
           >
-            Mở trang quản lý chi tiết &amp; Xuất Excel →
+            Xem toàn bộ &amp; Xuất file Excel →
           </Link>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-sm">
             <thead>
-              <tr className="border-b border-border-default text-xs uppercase tracking-wider text-text-muted bg-bg-ivory">
-                <th className="py-3 px-4">Mã đơn</th>
-                <th className="py-3 px-4">Khách hàng &amp; SĐT</th>
-                <th className="py-3 px-4">Phòng đặt</th>
-                <th className="py-3 px-4">Ngày nhận / trả</th>
-                <th className="py-3 px-4">Tổng tiền</th>
-                <th className="py-3 px-4">Trạng thái</th>
-                <th className="py-3 px-4 text-right">Duyệt nhanh</th>
+              <tr className="border-b border-border-default text-xs font-extrabold uppercase tracking-wider text-text-secondary bg-bg-ivory">
+                <th className="py-3.5 px-4 rounded-tl-xl">Khách hàng &amp; Liên hệ</th>
+                <th className="py-3.5 px-4">Phòng muốn đặt</th>
+                <th className="py-3.5 px-4">Ngày &amp; Giờ nhận phòng</th>
+                <th className="py-3.5 px-4">Trạng thái</th>
+                <th className="py-3.5 px-4 text-right rounded-tr-xl">Thao tác xác nhận</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border-default">
-              {bookings.slice(0, 10).map((bk) => (
+              {bookings.slice(0, 12).map((bk) => (
                 <tr key={bk.id} className="hover:bg-bg-ivory/60 transition-colors">
-                  <td className="py-3.5 px-4 font-bold text-bg-wood-deep">
-                    {bk.booking_code}
+                  <td className="py-4 px-4">
+                    <div className="font-extrabold text-base text-text-primary">
+                      {bk.guest_name}
+                    </div>
+                    <div className="text-xs font-extrabold text-brand-gold-dark mt-0.5">
+                      SĐT: {bk.guest_phone}
+                    </div>
+                    <div className="mt-2">
+                      <PhoneActions
+                        phone={bk.guest_phone}
+                        size="sm"
+                        smsBody={`Xin chào ${bk.guest_name}, Nhà Nghỉ Tha Phương xác nhận yêu cầu đặt ${bk.room_name} ngày ${formatDateVN(bk.check_in_date)}.`}
+                      />
+                    </div>
                   </td>
-                  <td className="py-3.5 px-4">
-                    <div className="font-semibold text-text-primary">{bk.guest_name}</div>
-                    <a
-                      href={`tel:${bk.guest_phone}`}
-                      className="text-xs text-brand-gold-dark font-medium hover:underline"
-                    >
-                      {bk.guest_phone}
-                    </a>
+
+                  <td className="py-4 px-4">
+                    <div className="font-extrabold text-text-primary text-base">
+                      {bk.room_name}
+                    </div>
+                    <div className="text-xs font-bold text-text-secondary mt-0.5">
+                      Mã phòng: <strong>{bk.room_code}</strong> •{' '}
+                      <strong>{bk.adults_count} khách</strong>
+                    </div>
+                    <div className="text-[11px] font-semibold text-text-muted mt-0.5">
+                      Mã đơn: {bk.booking_code}
+                    </div>
                   </td>
-                  <td className="py-3.5 px-4">
-                    <div className="font-medium text-text-primary">{bk.room_name}</div>
-                    <div className="text-xs text-text-muted">Mã: {bk.room_code}</div>
+
+                  <td className="py-4 px-4 text-xs">
+                    <div className="font-bold text-text-primary">
+                      Nhận: {formatDateVN(bk.check_in_date)} → Trả:{' '}
+                      {formatDateVN(bk.check_out_date)} ({bk.nights_count} đêm)
+                    </div>
+                    {bk.customer_notes && (
+                      <div className="mt-1.5 p-2 rounded-xl bg-brand-champagne/35 border border-brand-gold/30 text-text-primary font-bold">
+                        {bk.customer_notes}
+                      </div>
+                    )}
                   </td>
-                  <td className="py-3.5 px-4 text-xs text-text-secondary">
-                    {formatDateVN(bk.check_in_date)} → {formatDateVN(bk.check_out_date)}
-                    <span className="block text-text-muted">({bk.nights_count} đêm)</span>
-                  </td>
-                  <td className="py-3.5 px-4 font-bold text-text-primary">
-                    {formatVND(bk.total_amount)}
-                  </td>
-                  <td className="py-3.5 px-4">
+
+                  <td className="py-4 px-4">
                     <StatusBadge status={bk.status} />
                   </td>
-                  <td className="py-3.5 px-4 text-right">
+
+                  <td className="py-4 px-4 text-right">
                     {bk.status === 'pending' ? (
-                      <div className="inline-flex items-center gap-2">
+                      <div className="inline-flex flex-wrap items-center justify-end gap-2">
                         <Button
                           variant="primary"
                           size="sm"
+                          leftIcon={<Check className="w-3.5 h-3.5" />}
+                          className="rounded-xl font-extrabold"
                           onClick={() =>
-                            updateBookingStatus(
-                              bk.id,
-                              'confirmed',
-                              'Chủ nhà xác nhận đơn đặt phòng.'
-                            )
+                            setPendingAction({
+                              booking: bk,
+                              newStatus: 'confirmed',
+                            })
                           }
                         >
                           Xác nhận
@@ -206,23 +230,24 @@ export const AdminDashboardPage: React.FC = () => {
                         <Button
                           variant="danger"
                           size="sm"
+                          leftIcon={<XCircle className="w-3.5 h-3.5" />}
+                          className="rounded-xl font-extrabold"
                           onClick={() =>
-                            updateBookingStatus(
-                              bk.id,
-                              'cancelled',
-                              'Chủ nhà hủy đơn đặt phòng.'
-                            )
+                            setPendingAction({
+                              booking: bk,
+                              newStatus: 'cancelled',
+                            })
                           }
                         >
-                          Hủy
+                          Hủy bỏ
                         </Button>
                       </div>
                     ) : (
                       <Link
                         to="/admin/bookings"
-                        className="text-xs font-medium text-brand-gold-dark hover:underline"
+                        className="inline-flex items-center px-3 py-1.5 rounded-xl bg-bg-ivory border border-border-default text-xs font-extrabold text-brand-gold-dark hover:border-brand-gold"
                       >
-                        Chi tiết →
+                        Mở chi tiết →
                       </Link>
                     )}
                   </td>
@@ -232,6 +257,51 @@ export const AdminDashboardPage: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Confirmation Modal before confirming/cancelling booking */}
+      <ConfirmDialog
+        isOpen={Boolean(pendingAction)}
+        title={
+          pendingAction?.newStatus === 'confirmed'
+            ? 'Xác nhận giữ phòng cho khách?'
+            : 'Xác nhận HỦY đơn đặt phòng này?'
+        }
+        description={
+          pendingAction?.newStatus === 'confirmed'
+            ? 'Vui lòng kiểm tra lại thông tin khách hàng một lần nữa trước khi xác nhận:'
+            : 'Bạn có chắc chắn muốn hủy bỏ yêu cầu đặt phòng của khách hàng này không?'
+        }
+        confirmText={
+          pendingAction?.newStatus === 'confirmed'
+            ? 'Đồng ý Xác nhận'
+            : 'Đồng ý Hủy đơn'
+        }
+        cancelText="Quay lại"
+        variant={pendingAction?.newStatus === 'confirmed' ? 'confirm' : 'danger'}
+        details={
+          pendingAction
+            ? [
+                { label: 'Khách hàng', value: pendingAction.booking.guest_name },
+                { label: 'Số điện thoại', value: pendingAction.booking.guest_phone },
+                { label: 'Phòng đặt', value: pendingAction.booking.room_name || '' },
+                {
+                  label: 'Ngày nhận phòng',
+                  value: `${formatDateVN(pendingAction.booking.check_in_date)} (${pendingAction.booking.nights_count} đêm)`,
+                },
+                ...(pendingAction.booking.customer_notes
+                  ? [
+                      {
+                        label: 'Giờ nhận & Ghi chú',
+                        value: pendingAction.booking.customer_notes,
+                      },
+                    ]
+                  : []),
+              ]
+            : []
+        }
+        onConfirm={handleConfirmAction}
+        onCancel={() => setPendingAction(null)}
+      />
     </div>
   );
 };

@@ -43,8 +43,8 @@ export default {
         sans: ['"Be Vietnam Pro"', 'system-ui', '-apple-system', 'sans-serif'],
       },
       borderRadius: {
-        classic: '4px',
-        card: '6px',
+        classic: '14px',
+        card: '18px',
       },
       boxShadow: {
         luxury: '0 8px 30px rgba(48, 37, 31, 0.06)',
