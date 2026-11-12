@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "figma-mcp-server": {
+      "type": "http",
+      "url": "http://localhost:38450/mcp",
+      "tools": ["*"]
+    }
+  }
+}

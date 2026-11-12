@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *,
+  *::before,
+  *::after,
+  html,
+  body,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  span,
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  label,
+  li,
+  th,
+  td {
+    font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-style: normal !important;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color: #221C18;
+    background-color: #F8F5EF;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    color: #221C18;
+    background-color: #F8F5EF;
+    overflow-x: hidden;
+    letter-spacing: -0.01em;
+    line-height: 1.55;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-serif,
+  .font-sans,
+  .font-display {
+    font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    letter-spacing: -0.025em !important;
+  }
+}
+
+/* Override any old wide letter-spacing so Vietnamese diacritics look tight, bold, and modern across all pages */
+.tracking-widest,
+.tracking-wider,
+[class*='tracking-['] {
+  letter-spacing: -0.01em !important;
+}
+
+@layer components {
+  /* Modern Bold Vietnamese Sans-Serif Typography matching User Reference ("Mãn nhãn vượt xa giới hạn") */
+  .text-display-hero {
+    font-family: 'Be Vietnam Pro', sans-serif !important;
+    @apply font-extrabold text-3xl sm:text-5xl lg:text-[54px] xl:text-[60px] leading-[1.15] tracking-[-0.03em];
+  }
+  .text-heading-h1 {
+    font-family: 'Be Vietnam Pro', sans-serif !important;
+    @apply font-extrabold text-2xl sm:text-4xl lg:text-[42px] leading-[1.18] tracking-[-0.025em];
+  }
+  .text-heading-h2 {
+    font-family: 'Be Vietnam Pro', sans-serif !important;
+    @apply font-extrabold text-2xl sm:text-3xl lg:text-[34px] leading-[1.22] tracking-[-0.025em];
+  }
+  .text-heading-h3 {
+    font-family: 'Be Vietnam Pro', sans-serif !important;
+    @apply font-bold text-xl sm:text-2xl lg:text-[24px] leading-[1.28] tracking-[-0.02em];
+  }
+  .text-heading-h4 {
+    font-family: 'Be Vietnam Pro', sans-serif !important;
+    @apply text-lg sm:text-[19px] leading-[1.35] font-bold tracking-[-0.015em];
+  }
+  .text-price {
+    font-family: 'Be Vietnam Pro', sans-serif !important;
+    @apply text-2xl sm:text-[26px] leading-none font-extrabold tracking-[-0.02em];
+  }
+  .text-eyebrow {
+    font-family: 'Be Vietnam Pro', sans-serif !important;
+    @apply text-xs sm:text-sm font-semibold text-brand-gold-dark tracking-[-0.01em];
+  }
+  .container-luxury {
+    @apply max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F8F5EF;
+}
+::-webkit-scrollbar-thumb {
+  background: #C9B895;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B69A68;
+}
