@@ -293,12 +293,28 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return;
 
-    fetchInitialSupabaseData().then((remote) => {
-      if (!remote) return;
-      if (remote.rooms && remote.rooms.length > 0) setRooms(remote.rooms);
-      if (remote.settings) setSettings(remote.settings);
-      if (remote.pageSeoList && remote.pageSeoList.length > 0) {
-        setPageSeoList(remote.pageSeoList);
+    const loadRemoteData = () => {
+      fetchInitialSupabaseData().then((remote) => {
+        if (!remote) return;
+        if (remote.rooms && remote.rooms.length > 0) setRooms(remote.rooms);
+        if (remote.settings) setSettings(remote.settings);
+        if (remote.pageSeoList && remote.pageSeoList.length > 0) {
+          setPageSeoList(remote.pageSeoList);
+        }
+        if (remote.bookings && remote.bookings.length > 0) {
+          setBookings(remote.bookings);
+        }
+        if (remote.contactMessages && remote.contactMessages.length > 0) {
+          setContactMessages(remote.contactMessages);
+        }
+      });
+    };
+
+    loadRemoteData();
+
+    const { data: authSub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        loadRemoteData();
       }
     });
 
@@ -330,9 +346,20 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           }
         }
       )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'contact_messages' },
+        (payload) => {
+          const insertedMsg = payload.new as ContactMessage;
+          setContactMessages((prev) =>
+            prev.some((m) => m.id === insertedMsg.id) ? prev : [insertedMsg, ...prev]
+          );
+        }
+      )
       .subscribe();
 
     return () => {
+      authSub.subscription.unsubscribe();
       supabase?.removeChannel(channel);
     };
   }, [settings.sound_alerts_enabled]);

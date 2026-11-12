@@ -52,6 +52,8 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           role: 'admin',
           loginAt: new Date().toISOString(),
         });
+      } else if (_event === 'SIGNED_OUT') {
+        setAdminUser(null);
       }
     });
 
@@ -66,33 +68,41 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   ): Promise<{ success: boolean; error?: string }> => {
     const cleanEmail = email.trim().toLowerCase();
 
-    // 1. If Supabase Cloud is configured, authenticate via Supabase Auth first
+    // 1. Khi đã kết nối Supabase Cloud -> Xác thực 100% qua Supabase Auth trên Server
     if (isSupabaseConfigured && supabase) {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
         password,
       });
 
-      if (!error && data.user) {
-        const user: AdminUser = {
-          id: data.user.id,
-          email: data.user.email || cleanEmail,
-          name: 'Quản trị viên Nhà Nghỉ Tha Phương',
-          role: 'admin',
-          loginAt: new Date().toISOString(),
+      if (error || !data.user) {
+        return {
+          success: false,
+          error:
+            'Email hoặc mật khẩu quản trị không chính xác trên hệ thống Supabase Auth.',
         };
-        setAdminUser(user);
-        return { success: true };
       }
+
+      const user: AdminUser = {
+        id: data.user.id,
+        email: data.user.email || cleanEmail,
+        name: 'Quản trị viên Nhà Nghỉ Tha Phương',
+        role: 'admin',
+        loginAt: new Date().toISOString(),
+      };
+      setAdminUser(user);
+      return { success: true };
     }
 
-    // 2. Local Owner Fallback Credential (for local testing before Supabase Cloud connection)
-    const expectedEmail = (
-      import.meta.env.VITE_ADMIN_EMAIL || 'huynhduykhanh0406@gmail.com'
-    ).toLowerCase();
+    // 2. Chế độ Local Fallback (Chỉ dùng khi chưa cấu hình VITE_SUPABASE_URL)
+    const allowedLocalEmails = [
+      'minhkhang19012006@gmail.com',
+      'admin@nhanghithaphuong.vn',
+      'huynhduykhanh0406@gmail.com',
+    ];
     const expectedPass = import.meta.env.VITE_ADMIN_DEFAULT_PASSWORD || 'ThaPhuong@2026';
 
-    if (cleanEmail === expectedEmail && password === expectedPass) {
+    if (allowedLocalEmails.includes(cleanEmail) && password === expectedPass) {
       const user: AdminUser = {
         id: 'admin-owner-01',
         email: cleanEmail,

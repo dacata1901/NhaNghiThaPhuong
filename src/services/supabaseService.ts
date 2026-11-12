@@ -158,19 +158,23 @@ export async function fetchInitialSupabaseData(): Promise<{
   if (!isSupabaseConfigured || !supabase) return null;
 
   try {
-    const [roomsRes, settingsRes, seoRes] = await Promise.all([
+    const [roomsRes, settingsRes, seoRes, bookingsRes, messagesRes] = await Promise.all([
       supabase
         .from('rooms')
         .select('*, media:room_media(*)')
         .order('created_at', { ascending: true }),
       supabase.from('site_settings').select('*').eq('id', 1).maybeSingle(),
       supabase.from('page_seo').select('*'),
+      supabase.from('bookings').select('*').order('created_at', { ascending: false }),
+      supabase.from('contact_messages').select('*').order('created_at', { ascending: false }),
     ]);
 
     return {
       rooms: (roomsRes.data as Room[] | null) || undefined,
       settings: (settingsRes.data as HotelSettings | null) || undefined,
       pageSeoList: (seoRes.data as PageSeoConfig[] | null) || undefined,
+      bookings: (bookingsRes.data as Booking[] | null) || undefined,
+      contactMessages: (messagesRes.data as ContactMessage[] | null) || undefined,
     };
   } catch {
     return null;
