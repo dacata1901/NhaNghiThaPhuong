@@ -352,7 +352,7 @@ export const AdminBookingsPage: React.FC = () => {
                         </div>
                       ) : (
                         <span className="text-text-muted font-semibold">
-                          Nhận phòng giờ tiêu chuẩn (từ 14:00)
+                          Không có ghi chú
                         </span>
                       )}
                     </td>
@@ -362,13 +362,11 @@ export const AdminBookingsPage: React.FC = () => {
                     </td>
 
                     <td className="py-4 px-4 text-right">
-                      <div className="inline-flex flex-wrap items-center justify-end gap-1.5">
+                      <div className="ml-auto w-[208px] flex flex-col gap-2">
                         {bk.status === 'pending' && (
-                          <>
-                            <Button
-                              variant="primary"
-                              size="sm"
-                              className="rounded-xl font-extrabold"
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
                               onClick={() =>
                                 setPendingStatusAction({
                                   booking: bk,
@@ -376,13 +374,13 @@ export const AdminBookingsPage: React.FC = () => {
                                   note: 'Lễ tân đã xác nhận giữ phòng cho khách.',
                                 })
                               }
+                              className="h-9 inline-flex items-center justify-center gap-1.5 rounded-xl bg-state-success text-white text-xs font-extrabold shadow-sm hover:brightness-95 transition"
                             >
-                              Xác nhận
-                            </Button>
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              className="rounded-xl font-extrabold"
+                              <CheckCircle2 className="w-4 h-4" />
+                              <span>Xác nhận</span>
+                            </button>
+                            <button
+                              type="button"
                               onClick={() =>
                                 setPendingStatusAction({
                                   booking: bk,
@@ -390,37 +388,40 @@ export const AdminBookingsPage: React.FC = () => {
                                   note: 'Đơn đặt phòng đã được hủy bỏ.',
                                 })
                               }
+                              className="h-9 inline-flex items-center justify-center gap-1.5 rounded-xl bg-white border border-state-danger/50 text-state-danger text-xs font-extrabold hover:bg-state-danger hover:text-white transition"
                             >
-                              Hủy
-                            </Button>
-                          </>
+                              <XCircle className="w-4 h-4" />
+                              <span>Hủy đơn</span>
+                            </button>
+                          </div>
                         )}
 
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          leftIcon={<Eye className="w-3.5 h-3.5" />}
-                          className="rounded-xl font-extrabold"
-                          onClick={() => handleOpenDetail(bk)}
-                        >
-                          Chi tiết
-                        </Button>
-                        <button
-                          type="button"
-                          onClick={() => handlePrintBookingSlip(bk)}
-                          className="p-2 rounded-xl border border-border-default bg-bg-ivory hover:border-brand-gold text-text-secondary hover:text-text-primary"
-                          title="In phiếu đặt phòng"
-                        >
-                          <Printer className="w-4 h-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setBookingToDelete(bk)}
-                          className="p-2 rounded-xl border border-border-default bg-bg-ivory hover:border-state-danger text-state-danger transition-colors"
-                          title="Xóa đơn đặt phòng này"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenDetail(bk)}
+                            className="flex-1 h-9 inline-flex items-center justify-center gap-1.5 rounded-xl bg-bg-ivory border border-border-default text-text-primary text-xs font-extrabold hover:border-brand-gold hover:text-brand-gold-dark transition"
+                          >
+                            <Eye className="w-4 h-4" />
+                            <span>Chi tiết</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handlePrintBookingSlip(bk)}
+                            className="w-9 h-9 shrink-0 inline-flex items-center justify-center rounded-xl bg-bg-ivory border border-border-default text-text-secondary hover:border-brand-gold hover:text-text-primary transition"
+                            title="In phiếu đặt phòng"
+                          >
+                            <Printer className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setBookingToDelete(bk)}
+                            className="w-9 h-9 shrink-0 inline-flex items-center justify-center rounded-xl bg-bg-ivory border border-border-default text-state-danger hover:bg-state-danger hover:text-white hover:border-state-danger transition"
+                            title="Xóa đơn đặt phòng này"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                     </td>
                   </tr>
