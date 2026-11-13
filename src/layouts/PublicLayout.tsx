@@ -22,11 +22,11 @@ export const PublicLayout: React.FC = () => {
       {/* Mobile Sticky CTA Bar */}
       <div className="sm:hidden fixed bottom-0 left-0 right-0 z-30 bg-bg-wood-deep text-text-on-dark border-t border-brand-gold/40 px-4 py-2.5 flex items-center justify-between gap-3 shadow-luxury-lg">
         <a
-          href="tel:0944861242"
+          href="tel:0815325532"
           className="h-10 inline-flex items-center justify-center gap-1.5 text-xs font-extrabold text-brand-gold-light px-3.5 border border-brand-gold/50 rounded-xl whitespace-nowrap"
         >
           <Phone className="w-3.5 h-3.5" />
-          <span>0944 861 242</span>
+          <span>0815325532</span>
         </a>
         <Link
           to="/booking"

@@ -12,6 +12,7 @@ import {
   BellRing,
   Armchair,
   BedDouble,
+  Phone,
 } from 'lucide-react';
 import { useHotelData } from '@/context/HotelDataContext';
 import { SEOHead } from '@/components/common/SEOHead';
@@ -118,6 +119,96 @@ export const HomePage: React.FC = () => {
             {rooms.map((room) => (
               <RoomCard key={room.id} room={room} layout="grid" />
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 2.5 ƯU ĐÃI ĐẶC BIỆT DÀNH CHO KHÁCH HÀNG */}
+      <section className="py-16 sm:py-20 bg-bg-ivory-white border-b border-border-default">
+        <div className="container-luxury">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            <div className="lg:col-span-6">
+              <div className="rounded-2xl overflow-hidden border border-border-default shadow-luxury bg-white">
+                <img
+                  src="/images/uu-dai-tha-phuong.jpg"
+                  alt="Ưu đãi đặc biệt dành cho khách hàng tại Nhà Nghỉ Tha Phương - Hotline 0815325532"
+                  loading="lazy"
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            </div>
+
+            <div className="lg:col-span-6 space-y-5">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-brand-gold/15 border border-brand-gold/30 text-xs font-extrabold uppercase tracking-wider text-brand-gold-dark">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Ưu đãi đặc biệt</span>
+              </span>
+
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-text-primary leading-tight">
+                Nhiều Chương Trình Ưu Đãi Hấp Dẫn Dành Cho Quý Khách
+              </h2>
+
+              <p className="text-text-secondary text-base font-medium leading-relaxed">
+                Nhà Nghỉ Tha Phương luôn trân trọng và mong muốn mang đến những ưu đãi thiết thực nhất cho khách hàng thuê phòng theo giờ, theo tháng và lưu trú dài ngày.
+              </p>
+
+              <div className="space-y-3">
+                <div className="p-4 rounded-2xl bg-bg-ivory border border-border-default">
+                  <div className="font-extrabold text-text-primary text-sm sm:text-base">
+                    1. Thuê phòng theo giờ (Từ 6h – 11h)
+                  </div>
+                  <p className="text-xs sm:text-sm text-text-secondary font-medium mt-0.5">
+                    Tặng ngay voucher giảm <strong className="text-brand-gold-dark">20%</strong> trong 2 giờ đầu tiên.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-bg-ivory border border-border-default">
+                  <div className="font-extrabold text-text-primary text-sm sm:text-base">
+                    2. Thuê phòng theo tháng
+                  </div>
+                  <p className="text-xs sm:text-sm text-text-secondary font-medium mt-0.5">
+                    Khách thuê từ 1 tháng trở lên được tặng voucher trị giá <strong className="text-brand-gold-dark">1.000.000đ</strong> tiền mặt mỗi tháng.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-bg-ivory border border-border-default">
+                  <div className="font-extrabold text-text-primary text-sm sm:text-base">
+                    3. Ưu đãi khách ở dài ngày
+                  </div>
+                  <p className="text-xs sm:text-sm text-text-secondary font-medium mt-0.5">
+                    Lưu trú đủ 12 ngày trong vòng 2 tháng được <strong className="text-brand-gold-dark">miễn phí 1 ngày</strong> tiền phòng.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <Link to="/booking" className="w-full">
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    fullWidth
+                    rightIcon={<ArrowRight className="w-4 h-4" />}
+                    className="rounded-xl font-extrabold"
+                  >
+                    Đặt phòng nhận ưu đãi
+                  </Button>
+                </Link>
+                <a
+                  href={`tel:${(settings.phone_primary || '0815325532').replace(/\s+/g, '')}`}
+                  className="w-full"
+                >
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    fullWidth
+                    leftIcon={<Phone className="w-4 h-4" />}
+                    className="rounded-xl font-extrabold"
+                  >
+                    Gọi {settings.phone_primary || '0815325532'}
+                  </Button>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>

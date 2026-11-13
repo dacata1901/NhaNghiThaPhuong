@@ -26,19 +26,17 @@ export const Logo: React.FC<LogoProps> = ({
         className
       )}
     >
-      <div
+      <img
+        src="/images/logo-tha-phuong.webp"
+        alt={`Logo ${hotelName}`}
         className={cn(
-          'rounded-classic flex items-center justify-center font-extrabold tracking-tight border transition-colors shrink-0',
+          'rounded-full object-cover border-2 transition-transform group-hover:scale-105 shrink-0 bg-white shadow-sm',
           isSmall
-            ? 'w-9 h-9 md:w-11 md:h-11 lg:w-12 lg:h-12 text-sm md:text-base lg:text-lg'
-            : 'w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-base md:text-lg lg:text-xl',
-          isLight
-            ? 'bg-brand-gold text-text-on-dark border-brand-gold'
-            : 'bg-bg-wood-deep text-brand-gold-light border-bg-wood-deep group-hover:bg-brand-gold group-hover:text-text-on-dark group-hover:border-brand-gold'
+            ? 'w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14'
+            : 'w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16',
+          isLight ? 'border-brand-gold' : 'border-brand-gold/60'
         )}
-      >
-        TP
-      </div>
+      />
       <div className="flex flex-col">
         <span
           className={cn(

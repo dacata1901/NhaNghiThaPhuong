@@ -238,7 +238,7 @@ export const ContactPage: React.FC = () => {
                   <InputField
                     label="Số điện thoại liên hệ"
                     type="tel"
-                    placeholder="Ví dụ: 0944861242"
+                    placeholder="Ví dụ: 0815325532"
                     required
                     error={errors.phone?.message}
                     {...register('phone')}

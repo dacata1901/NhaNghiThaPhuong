@@ -312,7 +312,7 @@ export const BookingPage: React.FC = () => {
                     <InputField
                       label="Số điện thoại liên hệ"
                       type="tel"
-                      placeholder="Ví dụ: 0944861242"
+                      placeholder="Ví dụ: 0815325532"
                       required
                       error={errors.guest_phone?.message}
                       {...register('guest_phone')}

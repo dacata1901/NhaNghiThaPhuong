@@ -44,13 +44,13 @@ export const NotFoundPage: React.FC = () => {
                 Xem danh sách phòng
               </Button>
             </Link>
-            <a href="tel:0944861242">
+            <a href="tel:0815325532">
               <Button
                 variant="outline"
                 size="lg"
                 leftIcon={<Phone className="w-4 h-4" />}
               >
-                Gọi 0944 861 242
+                Gọi 0815325532
               </Button>
             </a>
           </div>

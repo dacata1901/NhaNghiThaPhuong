@@ -324,6 +324,15 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (!loaded.email_notification || loaded.email_notification === 'minhkhang19012006@gmail.com') {
       loaded.email_notification = DEFAULT_TEST_NOTIFICATION_EMAIL;
     }
+    if (
+      !loaded.phone_primary ||
+      loaded.phone_primary.replace(/\s+/g, '') === '0944861242'
+    ) {
+      loaded.phone_primary = '0815325532';
+    }
+    if (loaded.address_text && loaded.address_text.includes('0944 861 242')) {
+      loaded.address_text = loaded.address_text.replace(/0944\s*861\s*242/g, '0815325532');
+    }
     return loaded;
   });
   const [pageSeoList, setPageSeoList] = useState<PageSeoConfig[]>(() =>

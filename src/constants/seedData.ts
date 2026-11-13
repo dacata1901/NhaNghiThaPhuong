@@ -277,16 +277,16 @@ export const INITIAL_HOTEL_SETTINGS: HotelSettings = {
   tagline: 'Không gian nghỉ dưỡng ấm cúng, riêng tư và tiện nghi dành cho bạn',
   sub_tagline: 'NHÀ NGHỈ THA PHƯƠNG · SẠCH SẼ · RIÊNG TƯ · GIÁ TỐT',
   logo_text: 'THA PHƯƠNG',
-  phone_primary: '0944 861 242',
+  phone_primary: '0815325532',
   email_notification: 'huynhduykhanh0406@gmail.com',
-  address_text: 'Đang cập nhật địa chỉ chi tiết (Vui lòng liên hệ 0944 861 242 để được chỉ đường nhanh nhất)',
+  address_text: 'Đang cập nhật địa chỉ chi tiết (Vui lòng liên hệ 0815325532 để được chỉ đường nhanh nhất)',
   google_maps_embed_url: '',
   check_in_time: '14:00',
   check_out_time: '12:00',
   payment_policy_note:
     'Thanh toán trực tiếp tại quầy lễ tân khi nhận phòng (Tiền mặt hoặc Chuyển khoản ngân hàng). Chưa yêu cầu thanh toán trực tuyến trên website.',
   cancellation_policy_summary:
-    'Miễn phí hủy hoặc thay đổi lịch đặt phòng khi thông báo trước giờ nhận phòng ít nhất 24 giờ qua số điện thoại 0944 861 242 hoặc trang Tra cứu đặt phòng.',
+    'Miễn phí hủy hoặc thay đổi lịch đặt phòng khi thông báo trước giờ nhận phòng ít nhất 24 giờ qua số điện thoại 0815325532 hoặc trang Tra cứu đặt phòng.',
   about_title: 'Điểm dừng chân an tâm, sạch sẽ và chu đáo cho mọi hành trình',
   about_description:
     'Nhà Nghỉ Tha Phương mang đến không gian lưu trú gần gũi, kín đáo và sạch sẽ với mức chi phí hợp lý. Mỗi căn phòng đều được chăm chút kỹ lưỡng từ chăn ga gối nệm thơm tho, tường ốp gỗ ấm cúng đến hệ thống điều hòa, bình nóng lạnh và Wi-Fi tốc độ cao, giúp quý khách luôn cảm thấy thoải mái như ở nhà.',
@@ -312,7 +312,7 @@ export const INITIAL_HOTEL_SETTINGS: HotelSettings = {
       id: 'faq-2',
       question: 'Giờ nhận phòng (Check-in) và trả phòng (Check-out) là mấy giờ?',
       answer:
-        'Giờ nhận phòng tiêu chuẩn là từ 14:00 và trả phòng trước 12:00 trưa hôm sau. Nếu quý khách có nhu cầu nhận phòng sớm, nghỉ theo giờ hoặc trả phòng muộn, vui lòng gọi trực tiếp 0944 861 242 để được hỗ trợ linh hoạt.',
+        'Giờ nhận phòng tiêu chuẩn là từ 14:00 và trả phòng trước 12:00 trưa hôm sau. Nếu quý khách có nhu cầu nhận phòng sớm, nghỉ theo giờ hoặc trả phòng muộn, vui lòng gọi trực tiếp 0815325532 để được hỗ trợ linh hoạt.',
       category: 'Nhận & Trả phòng',
     },
     {
@@ -501,9 +501,9 @@ export const INITIAL_PAGE_SEO: PageSeoConfig[] = [
   {
     page_key: 'contact',
     page_name: 'Liên hệ',
-    seo_title: 'Liên Hệ & Chỉ Đường | Nhà Nghỉ Tha Phương (0944 861 242)',
+    seo_title: 'Liên Hệ & Chỉ Đường | Nhà Nghỉ Tha Phương (0815325532)',
     meta_description:
-      'Liên hệ lễ tân Nhà Nghỉ Tha Phương qua hotline 0944 861 242 hoặc email huynhduykhanh0406@gmail.com để được tư vấn và hỗ trợ đặt phòng 24/7.',
+      'Liên hệ lễ tân Nhà Nghỉ Tha Phương qua hotline 0815325532 hoặc email huynhduykhanh0406@gmail.com để được tư vấn và hỗ trợ đặt phòng 24/7.',
     canonical_path: '/contact',
     og_image_url: '/images/rooms/phong-1-giuong/giuong-chinh-1.jpg',
   },

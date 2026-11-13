@@ -145,7 +145,7 @@ export const DesignSystemPage: React.FC = () => {
             <InputField label="Default Input" placeholder="Nhập họ và tên..." />
             <InputField
               label="Input có ghi chú"
-              placeholder="0944 861 242"
+              placeholder="0815325532"
               helperText="Số điện thoại nhận mã đặt phòng"
             />
             <InputField

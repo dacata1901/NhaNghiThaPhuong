@@ -57,9 +57,11 @@ export const AdminLoginPage: React.FC = () => {
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
         <div className="text-center mb-7">
-          <div className="w-12 h-12 rounded-2xl bg-brand-gold/20 border border-brand-gold text-brand-gold-light flex items-center justify-center mx-auto mb-3 font-serif text-lg font-extrabold tracking-widest">
-            TP
-          </div>
+          <img
+            src="/images/logo-tha-phuong.webp"
+            alt="Logo Nhà Nghỉ Tha Phương"
+            className="w-16 h-16 rounded-full object-cover border-2 border-brand-gold mx-auto mb-3 bg-white shadow-luxury"
+          />
           <span className="text-xs font-extrabold uppercase tracking-[0.2em] text-brand-gold-light block">
             HỆ THỐNG QUẢN LÝ NỘI BỘ
           </span>

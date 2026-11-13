@@ -150,7 +150,7 @@ export async function sendContactNotificationEmail(
         </div>
       </div>
       <div style="background-color: #F8F5EF; padding: 12px 24px; text-align: center; font-size: 12px; color: #6E5F52; border-top: 1px solid #E0D5C2;">
-        Hệ thống thông báo tự động • Nhà Nghỉ Tha Phương (Hotline: 0944 861 242)
+        Hệ thống thông báo tự động • Nhà Nghỉ Tha Phương (Hotline: 0815325532)
       </div>
     </div>
   `;
@@ -300,7 +300,7 @@ export async function sendBookingNotificationEmail(
         </table>
       </div>
       <div style="background-color: #F8F5EF; padding: 12px 24px; text-align: center; font-size: 12px; color: #6E5F52; border-top: 1px solid #E0D5C2;">
-        Hệ thống đặt phòng trực tuyến • Nhà Nghỉ Tha Phương (Hotline: 0944 861 242)
+        Hệ thống đặt phòng trực tuyến • Nhà Nghỉ Tha Phương (Hotline: 0815325532)
       </div>
     </div>
   `;
