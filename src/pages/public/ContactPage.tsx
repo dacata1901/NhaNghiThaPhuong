@@ -142,6 +142,7 @@ export const ContactPage: React.FC = () => {
 
                   <PhoneActions
                     phone={settings.phone_primary}
+                    showNumber={false}
                     smsBody="Xin chào Nhà Nghỉ Tha Phương, tôi muốn liên hệ hỏi đặt phòng."
                   />
                 </div>

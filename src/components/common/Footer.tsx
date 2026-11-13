@@ -23,7 +23,7 @@ export const Footer: React.FC = () => {
           <div className="space-y-4">
             <Logo tone="light" size="small" hotelName={settings.hotel_name} />
             <p className="text-sm font-medium text-white/85 leading-relaxed">
-              Không gian nghỉ ngơi ấm cúng, sạch sẽ và riêng tư với đầy đủ tiện nghi cho khách cá nhân, cặp đôi và nhóm 3 người. Đặt giữ phòng trực tuyến nhanh gọn, phục vụ 24/7.
+              Không gian nghỉ ngơi ấm cúng, sạch sẽ và riêng tư với nhiều lựa chọn phòng nghỉ tiện nghi cho mọi nhu cầu lưu trú. Đặt giữ phòng trực tuyến nhanh gọn, phục vụ 24/7.
             </p>
             <div className="inline-flex items-center gap-2 text-xs font-extrabold text-brand-gold-light bg-white/10 px-4 py-2 rounded-xl border border-brand-gold/30">
               <ShieldCheck className="w-4 h-4 text-brand-gold shrink-0" />
@@ -44,7 +44,7 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <Link to="/rooms" className="hover:text-brand-gold-light transition-colors">
-                  Các loại phòng (1 Người, 2 Người, 3 Người)
+                  Các loại phòng (Nhiều lựa chọn)
                 </Link>
               </li>
               <li>
