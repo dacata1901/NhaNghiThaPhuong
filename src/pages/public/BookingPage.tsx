@@ -208,18 +208,20 @@ export const BookingPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto">
                 <Button
                   type="button"
                   variant="secondary"
+                  size="md"
+                  fullWidth
                   onClick={() => window.print()}
                   leftIcon={<Printer className="w-4 h-4" />}
                   className="rounded-xl font-extrabold"
                 >
                   In phiếu đặt phòng
                 </Button>
-                <Link to="/">
-                  <Button variant="primary" className="rounded-xl font-extrabold">
+                <Link to="/" className="w-full">
+                  <Button variant="primary" size="md" fullWidth className="rounded-xl font-extrabold">
                     Về trang chủ
                   </Button>
                 </Link>

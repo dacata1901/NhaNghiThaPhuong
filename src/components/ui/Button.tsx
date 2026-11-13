@@ -45,9 +45,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const sizeClasses = {
-      sm: 'px-4 py-2 text-[13px]',
-      md: 'px-5 py-2.5 text-[14px]',
-      lg: 'px-7 py-3.5 text-[15px]',
+      sm: 'h-9 px-3.5 text-[13px]',
+      md: 'h-10 sm:h-10 px-4 sm:px-5 text-[13px] sm:text-[14px]',
+      lg: 'h-11 sm:h-11 px-5 sm:px-6 text-[14px] sm:text-[15px]',
     };
 
     return (
@@ -55,7 +55,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         className={cn(
-          'inline-flex items-center justify-center gap-2 font-sans font-bold tracking-normal rounded-classic transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-gold/40 disabled:opacity-55 disabled:cursor-not-allowed',
+          'inline-flex items-center justify-center gap-2 whitespace-nowrap font-sans font-bold tracking-normal rounded-classic transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-gold/40 disabled:opacity-55 disabled:cursor-not-allowed',
           variantClasses[variant],
           sizeClasses[size],
           fullWidth && 'w-full',

@@ -78,23 +78,25 @@ export const HomePage: React.FC = () => {
             Đặt giữ phòng trực tuyến nhanh gọn — Có đầy đủ <strong>Phòng 1 Người, Phòng 2 Người và Phòng 3 Người</strong>. Chỉ cần chọn loại phòng, nhập Tên, Số điện thoại và Giờ nhận phòng cụ thể.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 mt-10">
-            <Link to="/booking">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-[420px] mt-9">
+            <Link to="/booking" className="w-full">
               <Button
                 variant="primary"
                 size="lg"
-                rightIcon={<ArrowRight className="w-5 h-5" />}
-                className="rounded-2xl font-extrabold px-9 py-4 text-base sm:text-lg h-14 shadow-luxury"
+                fullWidth
+                rightIcon={<ArrowRight className="w-4 h-4" />}
+                className="rounded-xl font-extrabold shadow-luxury"
               >
                 Đặt phòng ngay
               </Button>
             </Link>
-            <Link to="/rooms">
+            <Link to="/rooms" className="w-full">
               <Button
                 variant="overlay"
                 size="lg"
-                leftIcon={<BedDouble className="w-5 h-5" />}
-                className="rounded-2xl font-extrabold px-8 py-4 text-base sm:text-lg h-14"
+                fullWidth
+                leftIcon={<BedDouble className="w-4 h-4" />}
+                className="rounded-xl font-extrabold"
               >
                 Xem các loại phòng
               </Button>

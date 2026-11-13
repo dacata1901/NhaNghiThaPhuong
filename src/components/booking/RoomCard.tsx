@@ -79,16 +79,17 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, layout = 'grid' }) => 
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-border-default">
-            <Link to={`/rooms/${room.slug}`}>
-              <Button variant="secondary" size="md" className="rounded-xl font-extrabold">
+          <div className="grid grid-cols-2 sm:flex sm:items-center sm:justify-end gap-2.5 pt-4 border-t border-border-default">
+            <Link to={`/rooms/${room.slug}`} className="w-full sm:w-[155px]">
+              <Button variant="secondary" size="md" fullWidth className="rounded-xl font-extrabold">
                 Xem chi tiết
               </Button>
             </Link>
-            <Link to={`/booking?room=${room.slug}`}>
+            <Link to={`/booking?room=${room.slug}`} className="w-full sm:w-[155px]">
               <Button
                 variant="primary"
                 size="md"
+                fullWidth
                 rightIcon={<ArrowRight className="w-4 h-4" />}
                 className="rounded-xl font-extrabold"
               >

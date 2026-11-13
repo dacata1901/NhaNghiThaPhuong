@@ -37,7 +37,7 @@ export const RoomListPage: React.FC = () => {
             </p>
 
             {/* Nút chọn nhanh loại phòng theo đúng thứ tự 1 -> 2 -> 3 */}
-            <div className="inline-flex flex-wrap items-center justify-center gap-2 mt-6 bg-bg-ivory-white p-2 rounded-2xl border border-border-default shadow-xs">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mt-6 bg-bg-ivory-white p-2 rounded-2xl border border-border-default shadow-xs w-full max-w-4xl mx-auto">
               {[
                 { key: 'all', label: 'Tất cả loại phòng' },
                 { key: '1_bed', label: 'Phòng 1 Người (1 Giường)' },
@@ -48,14 +48,14 @@ export const RoomListPage: React.FC = () => {
                   key={tab.key}
                   type="button"
                   onClick={() => setSelectedType(tab.key)}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-extrabold transition-all inline-flex items-center gap-1.5 ${
+                  className={`h-10 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all inline-flex items-center justify-center gap-1.5 whitespace-nowrap ${
                     selectedType === tab.key
                       ? 'bg-bg-wood-deep text-white shadow-xs'
                       : 'text-text-primary hover:bg-bg-cream/70'
                   }`}
                 >
-                  <BedDouble className="w-4 h-4" />
-                  {tab.label}
+                  <BedDouble className="w-4 h-4 shrink-0" />
+                  <span className="truncate">{tab.label}</span>
                 </button>
               ))}
             </div>

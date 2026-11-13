@@ -67,13 +67,13 @@ export const Header: React.FC = () => {
         </nav>
 
         {/* Right: Clean Book CTA */}
-        <div className="hidden sm:flex items-center gap-2.5">
+        <div className="hidden sm:flex items-center gap-2.5 shrink-0">
           <Link to="/booking">
             <Button
               variant="primary"
               size="md"
               leftIcon={<CalendarCheck className="w-4 h-4" />}
-              className="rounded-full shadow-xs font-extrabold px-6"
+              className="rounded-full shadow-xs font-extrabold px-5"
             >
               Đặt phòng ngay
             </Button>
