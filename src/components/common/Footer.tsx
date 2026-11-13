@@ -17,7 +17,7 @@ export const Footer: React.FC = () => {
 
   return (
     <footer className="bg-bg-wood-deep text-white border-t border-brand-gold/30">
-      <div className="container-luxury py-12 sm:py-16">
+      <div className="container-luxury pt-12 pb-24 sm:py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14 items-start">
           {/* Cột 1: Thương hiệu Nhà Nghỉ Tha Phương */}
           <div className="space-y-4">
