@@ -456,7 +456,7 @@ export const AdminRoomsPage: React.FC = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div>
                 <label className="block text-xs font-extrabold uppercase tracking-wider text-text-secondary mb-1.5">
                   Loại phòng
@@ -504,7 +504,7 @@ export const AdminRoomsPage: React.FC = () => {
               />
 
               <InputField
-                label="Số khách tối đa"
+                label="Người lớn tối đa"
                 type="number"
                 min={1}
                 max={10}
@@ -513,6 +513,20 @@ export const AdminRoomsPage: React.FC = () => {
                   setEditingRoom({
                     ...editingRoom,
                     max_adults: Number(e.target.value),
+                  })
+                }
+              />
+
+              <InputField
+                label="Trẻ em tối đa"
+                type="number"
+                min={0}
+                max={10}
+                value={editingRoom.max_children}
+                onChange={(e) =>
+                  setEditingRoom({
+                    ...editingRoom,
+                    max_children: Math.max(0, Number(e.target.value)),
                   })
                 }
               />
@@ -555,14 +569,39 @@ export const AdminRoomsPage: React.FC = () => {
             </div>
 
             <TextAreaField
-              label="Mô tả ngắn gọn về phòng"
+              label="Mô tả ngắn (hiển thị trên thẻ phòng ở Trang Chủ / Danh sách phòng)"
               rows={2}
               value={editingRoom.short_description}
               onChange={(e) =>
                 setEditingRoom({
                   ...editingRoom,
                   short_description: e.target.value,
+                })
+              }
+            />
+
+            <TextAreaField
+              label="Giới thiệu phòng (hiển thị ở trang chi tiết phòng)"
+              rows={4}
+              placeholder="Mô tả chi tiết không gian, nội thất, view phòng..."
+              value={editingRoom.full_description}
+              onChange={(e) =>
+                setEditingRoom({
+                  ...editingRoom,
                   full_description: e.target.value,
+                })
+              }
+            />
+
+            <TextAreaField
+              label="Lưu ý khi nhận phòng (hiển thị ở trang chi tiết phòng)"
+              rows={2}
+              placeholder="VD: Thời gian nhận và trả phòng linh hoạt. Vui lòng mang theo CCCD khi nhận phòng."
+              value={editingRoom.policies}
+              onChange={(e) =>
+                setEditingRoom({
+                  ...editingRoom,
+                  policies: e.target.value,
                 })
               }
             />

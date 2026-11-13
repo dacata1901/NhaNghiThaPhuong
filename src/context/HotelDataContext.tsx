@@ -206,6 +206,9 @@ function normalizeRoomsList(rawRooms: Room[]): Room[] {
       bath: 'Phòng tắm riêng & Nước nóng lạnh',
       parking: 'Bãi đỗ xe an toàn miễn phí',
       clean: 'Chăn ga gối nệm sạch sẽ mỗi ngày',
+      bell: 'Lễ tân hỗ trợ 24/7',
+      coffee: 'Ghế thư giãn & Nước uống',
+      hot_water: 'Phòng tắm riêng & Nước nóng lạnh',
     };
 
     const normalizedAmenities = Array.isArray(r.amenities)
@@ -248,8 +251,9 @@ function normalizeRoomsList(rawRooms: Room[]): Room[] {
                 icon_name?: string;
                 is_featured_home?: boolean;
               };
-              const name = String(obj.name || '').trim();
-              if (!name) return null;
+              const rawName = String(obj.name || '').trim();
+              if (!rawName) return null;
+              const name = legacyAmenityMap[rawName.toLowerCase()] || rawName;
               return {
                 id: String(obj.id || `am-${idx}`),
                 code: String(obj.code || `custom-${idx}`),

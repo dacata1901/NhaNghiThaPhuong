@@ -133,10 +133,21 @@ export const RoomDetailPage: React.FC = () => {
                   <h2 className="text-base font-extrabold text-text-primary">
                     Giới thiệu phòng
                   </h2>
-                  <p className="text-sm text-text-secondary leading-relaxed">
+                  <p className="text-sm text-text-secondary leading-relaxed whitespace-pre-line">
                     {room.full_description || room.short_description}
                   </p>
                 </div>
+
+                {room.policies && room.policies.trim() && (
+                  <div className="space-y-2">
+                    <h2 className="text-base font-extrabold text-text-primary">
+                      Lưu ý khi nhận phòng
+                    </h2>
+                    <p className="text-sm text-text-secondary leading-relaxed whitespace-pre-line">
+                      {room.policies}
+                    </p>
+                  </div>
+                )}
 
                 {/* Tiện nghi có sẵn (Admin có thể tùy chỉnh cho từng phòng) */}
                 <div className="space-y-2.5 pt-2">
