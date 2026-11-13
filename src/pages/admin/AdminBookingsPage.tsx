@@ -478,9 +478,6 @@ export const AdminBookingsPage: React.FC = () => {
                 <p className="font-serif text-lg font-extrabold text-text-primary">
                   {selectedBooking.guest_name}
                 </p>
-                <p className="font-extrabold text-brand-gold-dark">
-                  SĐT: {selectedBooking.guest_phone}
-                </p>
                 <PhoneActions
                   phone={selectedBooking.guest_phone}
                   size="sm"
