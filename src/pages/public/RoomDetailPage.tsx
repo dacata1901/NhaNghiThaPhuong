@@ -138,22 +138,25 @@ export const RoomDetailPage: React.FC = () => {
                   </p>
                 </div>
 
-                {/* Tiện nghi có sẵn */}
+                {/* Tiện nghi có sẵn (Admin có thể tùy chỉnh cho từng phòng) */}
                 <div className="space-y-2.5 pt-2">
                   <h2 className="text-base font-extrabold text-text-primary">
                     Tiện nghi trong phòng
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {[
-                      'Máy lạnh làm mát nhanh',
-                      'Phòng tắm riêng & Nước nóng lạnh',
-                      'Wi-Fi tốc độ cao miễn phí',
-                      'Chăn ga gối nệm sạch sẽ mỗi ngày',
-                      'Tivi màn hình phẳng',
-                      'Bãi đỗ xe an toàn miễn phí',
-                    ].map((item) => (
+                    {(room.amenities && room.amenities.length > 0
+                      ? room.amenities.map((a) => a.name)
+                      : [
+                          'Máy lạnh làm mát nhanh',
+                          'Phòng tắm riêng & Nước nóng lạnh',
+                          'Wi-Fi tốc độ cao miễn phí',
+                          'Chăn ga gối nệm sạch sẽ mỗi ngày',
+                          'Tivi màn hình phẳng',
+                          'Bãi đỗ xe an toàn miễn phí',
+                        ]
+                    ).map((item, idx) => (
                       <div
-                        key={item}
+                        key={`${item}-${idx}`}
                         className="flex items-center gap-2 text-xs font-bold text-text-primary bg-bg-ivory px-3 py-2.5 rounded-xl border border-border-default"
                       >
                         <CheckCircle2 className="w-4 h-4 text-state-success shrink-0" />

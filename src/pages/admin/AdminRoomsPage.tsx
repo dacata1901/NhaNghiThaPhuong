@@ -74,6 +74,7 @@ export const AdminRoomsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [newImageUrl, setNewImageUrl] = useState('');
+  const [newAmenityName, setNewAmenityName] = useState('');
 
   // Confirm Dialog states for Save / Delete / Toggle Publish
   const [confirmSaveOpen, setConfirmSaveOpen] = useState(false);
@@ -565,6 +566,181 @@ export const AdminRoomsPage: React.FC = () => {
                 })
               }
             />
+
+            {/* Room Amenities Editor (Trong phòng có gì) */}
+            <div className="p-4 rounded-2xl bg-bg-ivory border border-border-default space-y-4">
+              <div>
+                <h4 className="font-serif text-base font-extrabold text-text-primary flex items-center gap-2">
+                  <Check className="w-4 h-4 text-brand-gold-dark" />
+                  Trong phòng có gì? ({(editingRoom.amenities || []).length} tiện nghi)
+                </h4>
+                <p className="text-xs font-medium text-text-secondary mt-0.5">
+                  Chọn nhanh các tiện nghi có sẵn hoặc tự thêm đồ dùng bên trong phòng để hiển thị cho khách xem.
+                </p>
+              </div>
+
+              {/* Preset quick-toggle chips */}
+              <div className="flex flex-wrap gap-2">
+                {[
+                  'Máy lạnh làm mát nhanh',
+                  'Phòng tắm riêng & Nước nóng lạnh',
+                  'Wi-Fi tốc độ cao miễn phí',
+                  'Tivi màn hình phẳng',
+                  'Chăn ga gối nệm sạch sẽ mỗi ngày',
+                  'Bãi đỗ xe an toàn miễn phí',
+                  'Ghế thư giãn & bàn trà',
+                  'Quạt mát',
+                  'Tủ quần áo',
+                  'Ấm đun nước siêu tốc',
+                ].map((presetName) => {
+                  const currentList = editingRoom.amenities || [];
+                  const isSelected = currentList.some(
+                    (a) => a.name.trim().toLowerCase() === presetName.toLowerCase()
+                  );
+                  return (
+                    <button
+                      key={presetName}
+                      type="button"
+                      onClick={() => {
+                        const updated = isSelected
+                          ? currentList.filter(
+                              (a) => a.name.trim().toLowerCase() !== presetName.toLowerCase()
+                            )
+                          : [
+                              ...currentList,
+                              {
+                                id: `am-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                                code: slugifyVN(presetName),
+                                name: presetName,
+                                icon_name: 'Check',
+                                is_featured_home: true,
+                              },
+                            ];
+                        setEditingRoom({ ...editingRoom, amenities: updated });
+                      }}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${
+                        isSelected
+                          ? 'bg-brand-gold text-text-on-dark border-brand-gold shadow-sm'
+                          : 'bg-white text-text-primary border-border-default hover:border-brand-gold/50'
+                      }`}
+                    >
+                      {isSelected && <Check className="w-3.5 h-3.5" />}
+                      <span>{presetName}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Custom amenity input */}
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  value={newAmenityName}
+                  onChange={(e) => setNewAmenityName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const trimmed = newAmenityName.trim();
+                      if (!trimmed) return;
+                      const currentList = editingRoom.amenities || [];
+                      if (
+                        currentList.some(
+                          (a) => a.name.trim().toLowerCase() === trimmed.toLowerCase()
+                        )
+                      ) {
+                        setNewAmenityName('');
+                        return;
+                      }
+                      setEditingRoom({
+                        ...editingRoom,
+                        amenities: [
+                          ...currentList,
+                          {
+                            id: `am-${Date.now()}`,
+                            code: slugifyVN(trimmed),
+                            name: trimmed,
+                            icon_name: 'Check',
+                            is_featured_home: true,
+                          },
+                        ],
+                      });
+                      setNewAmenityName('');
+                    }
+                  }}
+                  placeholder="Nhập thêm tiện nghi khác (VD: Tủ lạnh mini, Ban công...)"
+                  className="flex-1 h-10 px-3.5 rounded-xl bg-white border border-border-default text-sm font-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold"
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    const trimmed = newAmenityName.trim();
+                    if (!trimmed) return;
+                    const currentList = editingRoom.amenities || [];
+                    if (
+                      currentList.some(
+                        (a) => a.name.trim().toLowerCase() === trimmed.toLowerCase()
+                      )
+                    ) {
+                      setNewAmenityName('');
+                      return;
+                    }
+                    setEditingRoom({
+                      ...editingRoom,
+                      amenities: [
+                        ...currentList,
+                        {
+                          id: `am-${Date.now()}`,
+                          code: slugifyVN(trimmed),
+                          name: trimmed,
+                          icon_name: 'Check',
+                          is_featured_home: true,
+                        },
+                      ],
+                    });
+                    setNewAmenityName('');
+                  }}
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Thêm tiện nghi</span>
+                </Button>
+              </div>
+
+              {/* Active amenities list */}
+              {(editingRoom.amenities || []).length > 0 && (
+                <div className="space-y-1.5 pt-1">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-text-muted">
+                    Danh sách đang hiển thị cho khách:
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {(editingRoom.amenities || []).map((am) => (
+                      <div
+                        key={am.id}
+                        className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-white border border-border-default text-xs font-bold text-text-primary"
+                      >
+                        <span className="truncate">{am.name}</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditingRoom({
+                              ...editingRoom,
+                              amenities: (editingRoom.amenities || []).filter(
+                                (item) => item.id !== am.id
+                              ),
+                            })
+                          }
+                          className="p-1 rounded-lg text-status-danger hover:bg-status-danger-bg transition-colors shrink-0"
+                          title="Xóa tiện nghi này"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Simple Image Management */}
             <div className="p-4 rounded-2xl bg-bg-ivory border border-border-default space-y-4">

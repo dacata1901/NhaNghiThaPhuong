@@ -1,238 +1,277 @@
-import React, { useState } from 'react';
-import { Save, Plus, Trash2, CheckCircle2, FileText, HelpCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import {
+  Save,
+  Plus,
+  Trash2,
+  CheckCircle2,
+  FileText,
+  Sparkles,
+  Image as ImageIcon,
+  ExternalLink,
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useHotelData } from '@/context/HotelDataContext';
 import { Button } from '@/components/ui/Button';
 import { InputField, TextAreaField } from '@/components/ui/InputField';
-import type { FaqItem } from '@/types';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 export const AdminContentPage: React.FC = () => {
   const { settings, updateSettings } = useHotelData();
-
   const [draft, setDraft] = useState(settings);
-  const [savedToast, setSavedToast] = useState(false);
-  const [newFaqQuestion, setNewFaqQuestion] = useState('');
-  const [newFaqAnswer, setNewFaqAnswer] = useState('');
+  const [newHighlight, setNewHighlight] = useState('');
+  const [confirmSaveOpen, setConfirmSaveOpen] = useState(false);
+  const [saved, setSaved] = useState(false);
 
-  const handleSaveAll = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateSettings(draft);
-    setSavedToast(true);
-    setTimeout(() => setSavedToast(false), 3000);
-  };
+  useEffect(() => {
+    setDraft(settings);
+  }, [settings]);
 
-  const handleAddFaq = () => {
-    if (!newFaqQuestion.trim() || !newFaqAnswer.trim()) return;
-    const item: FaqItem = {
-      id: `faq-${Date.now()}`,
-      question: newFaqQuestion.trim(),
-      answer: newFaqAnswer.trim(),
-    };
-    setDraft({
+  const handleConfirmSave = () => {
+    updateSettings({
       ...draft,
-      faqs: [...draft.faqs, item],
+      about_highlights: (draft.about_highlights || [])
+        .map((h) => h.trim())
+        .filter(Boolean),
     });
-    setNewFaqQuestion('');
-    setNewFaqAnswer('');
+    setConfirmSaveOpen(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
   };
 
-  const handleDeleteFaq = (id: string) => {
+  const handleAddHighlight = () => {
+    const trimmed = newHighlight.trim();
+    if (!trimmed) return;
     setDraft({
       ...draft,
-      faqs: draft.faqs.filter((f) => f.id !== id),
+      about_highlights: [...(draft.about_highlights || []), trimmed],
+    });
+    setNewHighlight('');
+  };
+
+  const handleUpdateHighlight = (index: number, value: string) => {
+    const next = [...(draft.about_highlights || [])];
+    next[index] = value;
+    setDraft({ ...draft, about_highlights: next });
+  };
+
+  const handleRemoveHighlight = (index: number) => {
+    setDraft({
+      ...draft,
+      about_highlights: (draft.about_highlights || []).filter((_, i) => i !== index),
     });
   };
 
   return (
-    <form onSubmit={handleSaveAll} className="space-y-6">
-      {/* Header */}
-      <div className="bg-bg-ivory-white border border-border-default rounded-classic p-6 shadow-luxury-sm flex flex-wrap items-center justify-between gap-4">
+    <div className="space-y-6 max-w-4xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-widest text-brand-gold-dark">
-            CONTENT MANAGEMENT SYSTEM • QUẢN LÝ NỘI DUNG WEBSITE
-          </span>
-          <h2 className="font-serif text-2xl font-bold text-text-primary mt-1">
-            Biên Tập Nội Dung Trang Chủ, Giới Thiệu & FAQ
-          </h2>
-          <p className="text-xs text-text-secondary mt-1">
-            Mọi thay đổi tại đây sẽ cập nhật ngay lập tức trên giao diện Website khách hàng mà không cần sửa code.
+          <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-text-primary">
+            Nội dung trang khách hàng
+          </h1>
+          <p className="text-sm font-medium text-text-secondary mt-1">
+            Chỉnh sửa trực tiếp chữ, hình nền Trang Chủ và mục Giới Thiệu mà khách hàng nhìn thấy trên website.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          {savedToast && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-state-success bg-state-success/10 px-3 py-2 rounded-classic">
-              <CheckCircle2 className="w-4 h-4" />
-              Đã lưu nội dung thành công!
-            </span>
-          )}
-          <Button
-            type="submit"
-            variant="primary"
-            leftIcon={<Save className="w-4 h-4" />}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Link
+            to="/"
+            target="_blank"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-border-default text-xs font-bold text-text-primary hover:border-brand-gold transition-colors"
           >
-            Lưu toàn bộ thay đổi
+            <ExternalLink className="w-3.5 h-3.5 text-brand-gold-dark" />
+            <span>Xem Trang Chủ</span>
+          </Link>
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => setConfirmSaveOpen(true)}
+          >
+            <Save className="w-4 h-4" />
+            <span>Lưu nội dung</span>
           </Button>
         </div>
       </div>
 
-      {/* Hero & Intro Section */}
-      <div className="bg-bg-ivory-white border border-border-default rounded-classic p-6 shadow-luxury-sm space-y-5">
-        <h3 className="font-serif text-xl font-bold text-text-primary flex items-center gap-2 border-b border-border-default pb-3">
-          <FileText className="w-5 h-5 text-brand-gold-dark" />
-          1. Banner Trang Chủ & Giới Thiệu Nhà Nghỉ
-        </h3>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <InputField
-            label="Dòng chữ Eyebrow trên Hero Banner"
-            value={draft.sub_tagline}
-            onChange={(e) => setDraft({ ...draft, sub_tagline: e.target.value })}
-          />
-          <InputField
-            label="Thông điệp Tagline chính"
-            value={draft.tagline}
-            onChange={(e) => setDraft({ ...draft, tagline: e.target.value })}
-          />
+      {saved && (
+        <div className="p-4 rounded-xl bg-status-success-bg border border-status-success/30 text-status-success text-sm font-bold flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 shrink-0" />
+          <span>Đã lưu nội dung thành công và cập nhật lên trang khách hàng!</span>
         </div>
+      )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <InputField
-            label="Đường dẫn Ảnh nền Hero Trang chủ"
-            value={draft.hero_image_url}
-            onChange={(e) => setDraft({ ...draft, hero_image_url: e.target.value })}
-          />
-          <InputField
-            label="Link Video Giới thiệu (MP4 / YouTube - Tùy chọn)"
-            placeholder="Để trống nếu chưa có video"
-            value={draft.intro_video_url || ''}
-            onChange={(e) => setDraft({ ...draft, intro_video_url: e.target.value })}
-          />
+      {/* 1. Trang Chủ - Hero Banner */}
+      <div className="bg-bg-surface border border-border-default rounded-2xl p-6 shadow-xs space-y-5">
+        <div className="flex items-center gap-2.5 border-b border-border-default pb-3">
+          <Sparkles className="w-5 h-5 text-brand-gold-dark" />
+          <div>
+            <h2 className="font-serif text-lg font-extrabold text-text-primary">
+              Trang Chủ — Khung Banner đầu trang (Hero)
+            </h2>
+            <p className="text-xs font-medium text-text-secondary">
+              Hiển thị ngay khi khách hàng vừa truy cập vào trang chủ website.
+            </p>
+          </div>
         </div>
 
         <InputField
-          label="Tiêu đề phần Giới thiệu Nhà Nghỉ"
-          value={draft.about_title}
-          onChange={(e) => setDraft({ ...draft, about_title: e.target.value })}
+          label="Dòng giới thiệu nhỏ phía trên (Eyebrow)"
+          value={draft.sub_tagline || ''}
+          onChange={(e) => setDraft({ ...draft, sub_tagline: e.target.value })}
+          placeholder="VD: Nhà Nghỉ Tha Phương • Sạch sẽ • Riêng tư • Phục vụ 24/7"
         />
 
-        <TextAreaField
-          label="Đoạn văn mô tả Giới thiệu Nhà Nghỉ Tha Phương"
-          rows={3}
-          value={draft.about_description}
-          onChange={(e) => setDraft({ ...draft, about_description: e.target.value })}
+        <InputField
+          label="Tiêu đề lớn Trang Chủ"
+          value={draft.tagline || ''}
+          onChange={(e) => setDraft({ ...draft, tagline: e.target.value })}
+          placeholder="VD: Không Gian Nghỉ Ngơi Sạch Sẽ, Riêng Tư & Tiện Nghi"
         />
+
+        <div className="space-y-2">
+          <InputField
+            label="Đường dẫn ảnh nền Banner Trang Chủ (URL hoặc đường dẫn /images/...)"
+            value={draft.hero_image_url || ''}
+            onChange={(e) => setDraft({ ...draft, hero_image_url: e.target.value })}
+            placeholder="/images/rooms/phong-1-giuong/giuong-chinh-1.jpg"
+          />
+          {draft.hero_image_url && (
+            <div className="p-3 rounded-xl bg-bg-ivory border border-border-default flex items-center gap-4">
+              <img
+                src={draft.hero_image_url}
+                alt="Xem trước ảnh nền Trang Chủ"
+                className="w-24 h-16 rounded-lg object-cover border border-border-default shrink-0"
+              />
+              <div className="text-xs font-medium text-text-secondary flex items-center gap-1.5">
+                <ImageIcon className="w-4 h-4 text-brand-gold-dark shrink-0" />
+                <span>Ảnh nền xem trước cho Banner đầu Trang Chủ</span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Policies Summary */}
-      <div className="bg-bg-ivory-white border border-border-default rounded-classic p-6 shadow-luxury-sm space-y-5">
-        <h3 className="font-serif text-xl font-bold text-text-primary border-b border-border-default pb-3">
-          2. Chính Sách Thanh Toán & Hủy Phòng Hiển Thị Cho Khách
-        </h3>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <InputField
-            label="Giờ nhận phòng tiêu chuẩn (Check-in)"
-            value={draft.check_in_time}
-            onChange={(e) => setDraft({ ...draft, check_in_time: e.target.value })}
-          />
-          <InputField
-            label="Giờ trả phòng tiêu chuẩn (Check-out)"
-            value={draft.check_out_time}
-            onChange={(e) => setDraft({ ...draft, check_out_time: e.target.value })}
-          />
+      {/* 2. Giới Thiệu & Điểm Nổi Bật */}
+      <div className="bg-bg-surface border border-border-default rounded-2xl p-6 shadow-xs space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-default pb-3">
+          <div className="flex items-center gap-2.5">
+            <FileText className="w-5 h-5 text-brand-gold-dark" />
+            <div>
+              <h2 className="font-serif text-lg font-extrabold text-text-primary">
+                Mục Giới Thiệu & Điểm Nổi Bật
+              </h2>
+              <p className="text-xs font-medium text-text-secondary">
+                Hiển thị ở mục Giới thiệu trên Trang Chủ và trang Giới Thiệu riêng.
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/gioi-thieu"
+            target="_blank"
+            className="inline-flex items-center gap-1 text-xs font-bold text-brand-gold-dark hover:underline"
+          >
+            <span>Xem trang Giới Thiệu</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </Link>
         </div>
 
-        <TextAreaField
-          label="Ghi chú phương thức thanh toán (Mặc định: Thu tiền trực tiếp tại lễ tân)"
-          rows={2}
-          value={draft.payment_policy_note}
-          onChange={(e) => setDraft({ ...draft, payment_policy_note: e.target.value })}
+        <InputField
+          label="Tiêu đề mục Giới Thiệu"
+          value={draft.about_title || ''}
+          onChange={(e) => setDraft({ ...draft, about_title: e.target.value })}
+          placeholder="VD: Chào mừng đến với Nhà Nghỉ Tha Phương"
         />
 
         <TextAreaField
-          label="Tóm tắt chính sách đổi & hủy phòng"
-          rows={2}
-          value={draft.cancellation_policy_summary}
-          onChange={(e) =>
-            setDraft({ ...draft, cancellation_policy_summary: e.target.value })
-          }
+          label="Đoạn văn Giới Thiệu chi tiết"
+          rows={4}
+          value={draft.about_description || ''}
+          onChange={(e) => setDraft({ ...draft, about_description: e.target.value })}
+          placeholder="Mô tả về không gian, sự sạch sẽ, vị trí và phong cách phục vụ của nhà nghỉ..."
         />
-      </div>
 
-      {/* FAQ Management */}
-      <div className="bg-bg-ivory-white border border-border-default rounded-classic p-6 shadow-luxury-sm space-y-5">
-        <h3 className="font-serif text-xl font-bold text-text-primary flex items-center gap-2 border-b border-border-default pb-3">
-          <HelpCircle className="w-5 h-5 text-brand-gold-dark" />
-          3. Quản Lý Câu Hỏi Thường Gặp (FAQ — {draft.faqs.length} câu hỏi)
-        </h3>
+        {/* Điểm nổi bật */}
+        <div className="space-y-3 pt-2">
+          <div>
+            <label className="block text-sm font-bold text-text-primary">
+              Các điểm nổi bật ({(draft.about_highlights || []).length})
+            </label>
+            <p className="text-xs font-medium text-text-secondary">
+              Mỗi dòng là một điểm cộng hiển thị kèm dấu tích xanh trên Trang Chủ.
+            </p>
+          </div>
 
-        <div className="space-y-3">
-          {draft.faqs.map((faq, idx) => (
-            <div
-              key={faq.id}
-              className="p-4 rounded-classic bg-bg-ivory border border-border-default space-y-2"
-            >
-              <div className="flex items-start justify-between gap-3">
+          <div className="space-y-2.5">
+            {(draft.about_highlights || []).map((item, idx) => (
+              <div key={idx} className="flex items-center gap-2">
                 <input
                   type="text"
-                  value={faq.question}
-                  onChange={(e) => {
-                    const updated = [...draft.faqs];
-                    updated[idx] = { ...faq, question: e.target.value };
-                    setDraft({ ...draft, faqs: updated });
-                  }}
-                  className="flex-1 font-serif font-bold text-text-primary bg-bg-ivory-white px-3 py-1.5 rounded-classic border border-border-default text-sm"
+                  value={item}
+                  onChange={(e) => handleUpdateHighlight(idx, e.target.value)}
+                  className="flex-1 h-11 px-3.5 rounded-xl bg-bg-ivory border border-border-default text-sm font-medium text-text-primary focus:outline-none focus:border-brand-gold"
+                  placeholder="Nhập điểm nổi bật..."
                 />
                 <button
                   type="button"
-                  onClick={() => handleDeleteFaq(faq.id)}
-                  className="p-1.5 text-state-danger hover:bg-state-danger/10 rounded-classic"
-                  title="Xóa câu hỏi này"
+                  onClick={() => handleRemoveHighlight(idx)}
+                  className="p-2.5 rounded-xl text-status-danger hover:bg-status-danger-bg border border-transparent hover:border-status-danger/20 transition-colors"
+                  title="Xóa dòng này"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
-              <textarea
-                rows={2}
-                value={faq.answer}
-                onChange={(e) => {
-                  const updated = [...draft.faqs];
-                  updated[idx] = { ...faq, answer: e.target.value };
-                  setDraft({ ...draft, faqs: updated });
-                }}
-                className="w-full text-xs text-text-secondary bg-bg-ivory-white px-3 py-2 rounded-classic border border-border-default"
-              />
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* Add new FAQ */}
-        <div className="p-4 rounded-classic bg-bg-cream/60 border border-border-default space-y-3">
-          <span className="text-xs font-semibold uppercase tracking-wider text-text-primary block">
-            Thêm câu hỏi thường gặp mới
-          </span>
-          <InputField
-            placeholder="Nhập câu hỏi mới..."
-            value={newFaqQuestion}
-            onChange={(e) => setNewFaqQuestion(e.target.value)}
-          />
-          <TextAreaField
-            rows={2}
-            placeholder="Nhập câu trả lời chi tiết..."
-            value={newFaqAnswer}
-            onChange={(e) => setNewFaqAnswer(e.target.value)}
-          />
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            leftIcon={<Plus className="w-3.5 h-3.5" />}
-            onClick={handleAddFaq}
-          >
-            Thêm vào danh sách FAQ
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2 pt-1">
+            <input
+              type="text"
+              value={newHighlight}
+              onChange={(e) => setNewHighlight(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddHighlight();
+                }
+              }}
+              placeholder="Thêm điểm nổi bật mới (VD: Nhận & trả phòng linh hoạt 24/7)..."
+              className="flex-1 h-11 px-3.5 rounded-xl bg-white border border-border-default text-sm font-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold"
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              onClick={handleAddHighlight}
+            >
+              <Plus className="w-4 h-4" />
+              <span>Thêm dòng</span>
+            </Button>
+          </div>
         </div>
       </div>
-    </form>
+
+      {/* Bottom Save Button */}
+      <div className="flex justify-end">
+        <Button
+          variant="primary"
+          size="md"
+          onClick={() => setConfirmSaveOpen(true)}
+        >
+          <Save className="w-4 h-4" />
+          <span>Lưu tất cả nội dung</span>
+        </Button>
+      </div>
+
+      <ConfirmDialog
+        isOpen={confirmSaveOpen}
+        title="Lưu thay đổi nội dung?"
+        description="Nội dung Trang Chủ và Trang Giới Thiệu sẽ được cập nhật ngay lập tức cho khách hàng xem."
+        confirmText="Lưu thay đổi"
+        cancelText="Xem lại"
+        variant="confirm"
+        onConfirm={handleConfirmSave}
+        onCancel={() => setConfirmSaveOpen(false)}
+      />
+    </div>
   );
 };

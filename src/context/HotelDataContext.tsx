@@ -199,6 +199,71 @@ function normalizeRoomsList(rawRooms: Room[]): Room[] {
       .replace(/\s*\(Deluxe Twin\)/gi, '')
       .replace(/\s*\(Family Suite\)/gi, '');
 
+    const legacyAmenityMap: Record<string, string> = {
+      wifi: 'Wi-Fi tốc độ cao miễn phí',
+      ac: 'Máy lạnh làm mát nhanh',
+      tv: 'Tivi màn hình phẳng',
+      bath: 'Phòng tắm riêng & Nước nóng lạnh',
+      parking: 'Bãi đỗ xe an toàn miễn phí',
+      clean: 'Chăn ga gối nệm sạch sẽ mỗi ngày',
+    };
+
+    const normalizedAmenities = Array.isArray(r.amenities)
+      ? r.amenities
+          .map((item: unknown, idx: number) => {
+            if (typeof item === 'string') {
+              const trimmed = item.trim();
+              if (!trimmed) return null;
+              if (trimmed.startsWith('{')) {
+                try {
+                  const parsed = JSON.parse(trimmed);
+                  if (parsed && typeof parsed.name === 'string' && parsed.name.trim()) {
+                    return {
+                      id: String(parsed.id || `am-${idx}`),
+                      code: String(parsed.code || `custom-${idx}`),
+                      name: parsed.name.trim(),
+                      description: parsed.description ? String(parsed.description) : undefined,
+                      icon_name: parsed.icon_name ? String(parsed.icon_name) : 'Check',
+                      is_featured_home: Boolean(parsed.is_featured_home),
+                    };
+                  }
+                } catch {
+                  // fall through to plain string
+                }
+              }
+              return {
+                id: `am-${idx}`,
+                code: trimmed.toLowerCase(),
+                name: legacyAmenityMap[trimmed.toLowerCase()] || trimmed,
+                icon_name: 'Check',
+                is_featured_home: true,
+              };
+            }
+            if (item && typeof item === 'object' && 'name' in item) {
+              const obj = item as {
+                id?: string;
+                code?: string;
+                name?: string;
+                description?: string;
+                icon_name?: string;
+                is_featured_home?: boolean;
+              };
+              const name = String(obj.name || '').trim();
+              if (!name) return null;
+              return {
+                id: String(obj.id || `am-${idx}`),
+                code: String(obj.code || `custom-${idx}`),
+                name,
+                description: obj.description ? String(obj.description) : undefined,
+                icon_name: obj.icon_name ? String(obj.icon_name) : 'Check',
+                is_featured_home: obj.is_featured_home ?? true,
+              };
+            }
+            return null;
+          })
+          .filter((a): a is NonNullable<typeof a> => a !== null)
+      : [];
+
     return {
       ...r,
       name: cleanName,
@@ -211,6 +276,7 @@ function normalizeRoomsList(rawRooms: Room[]): Room[] {
           ? 'Phòng 3 giường'
           : r.room_type_label,
       full_description: cleanFullDesc,
+      amenities: normalizedAmenities,
     };
   });
 
@@ -877,6 +943,9 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           total_quantity: roomRow.total_quantity,
           short_description: roomRow.short_description,
           full_description: roomRow.full_description,
+          amenities: (roomRow.amenities || []).map((a) =>
+            typeof a === 'string' ? a : JSON.stringify(a)
+          ),
           policies: roomRow.policies,
           status: roomRow.status,
           is_published: roomRow.is_published,
@@ -1047,6 +1116,8 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           cancellation_policy_summary: cleanedSettings.cancellation_policy_summary,
           about_title: cleanedSettings.about_title,
           about_description: cleanedSettings.about_description,
+          hero_image_url: cleanedSettings.hero_image_url,
+          about_highlights: cleanedSettings.about_highlights,
           sound_alerts_enabled: cleanedSettings.sound_alerts_enabled,
         });
       };

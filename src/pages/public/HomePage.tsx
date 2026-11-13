@@ -69,10 +69,10 @@ export const HomePage: React.FC = () => {
 
         <div className="container-luxury relative z-10 py-12 flex flex-col items-center text-center">
           <span className="text-sm sm:text-base font-extrabold text-brand-gold-light mb-5 px-5 py-2 border border-brand-gold/50 rounded-full bg-bg-wood-deep/70 shadow-sm">
-            Nhà Nghỉ Tha Phương • Sạch sẽ • Riêng tư • Phục vụ 24/7
+            {settings.sub_tagline || 'Nhà Nghỉ Tha Phương • Sạch sẽ • Riêng tư • Phục vụ 24/7'}
           </span>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl text-white max-w-5xl font-extrabold leading-tight tracking-tight">
-            Không Gian Nghỉ Ngơi Sạch Sẽ, Riêng Tư &amp; Tiện Nghi
+            {settings.tagline || 'Không Gian Nghỉ Ngơi Sạch Sẽ, Riêng Tư & Tiện Nghi'}
           </h1>
           <p className="text-base sm:text-xl text-white/90 max-w-3xl mt-6 leading-relaxed font-semibold">
             Đặt giữ phòng trực tuyến nhanh gọn — Có đầy đủ <strong>Phòng 1 Giường, Phòng 2 Giường và Phòng 3 Giường</strong>. Chỉ cần chọn loại phòng, nhập Tên, Số điện thoại và Giờ nhận phòng cụ thể.
