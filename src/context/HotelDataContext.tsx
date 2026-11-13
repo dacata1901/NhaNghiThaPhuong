@@ -179,12 +179,32 @@ function getRoomSortWeight(r: Room): number {
   return 10 + (r.bed_count || 0);
 }
 
+function normalizeRoomWording(text?: string): string {
+  if (!text) return '';
+  return text
+    .replace(/Phòng\s*1\s*Người/g, 'Phòng 1 Giường')
+    .replace(/Phòng\s*2\s*Người/g, 'Phòng 2 Giường')
+    .replace(/Phòng\s*3\s*Người/g, 'Phòng 3 Giường')
+    .replace(/phòng\s*1\s*người/gi, 'phòng 1 giường')
+    .replace(/phòng\s*2\s*người/gi, 'phòng 2 giường')
+    .replace(/phòng\s*3\s*người/gi, 'phòng 3 giường');
+}
+
+function normalizeBooking(b: Booking): Booking {
+  return {
+    ...b,
+    room_name: b.room_name ? normalizeRoomWording(b.room_name) : b.room_name,
+  };
+}
+
 function normalizeRoomsList(rawRooms: Room[]): Room[] {
   const cleaned = rawRooms.map((r) => {
-    let cleanName = r.name
-      .replace(/\s*\(Standard Single\)/gi, '')
-      .replace(/\s*\(Deluxe Twin\)/gi, '')
-      .replace(/\s*\(Family Suite\)/gi, '');
+    let cleanName = normalizeRoomWording(
+      r.name
+        .replace(/\s*\(Standard Single\)/gi, '')
+        .replace(/\s*\(Deluxe Twin\)/gi, '')
+        .replace(/\s*\(Family Suite\)/gi, '')
+    );
 
     if (r.id === 'room-1-bed' || r.room_type === '1_bed') {
       cleanName = 'Phòng 1 Giường';
@@ -194,10 +214,12 @@ function normalizeRoomsList(rawRooms: Room[]): Room[] {
       cleanName = 'Phòng 3 Giường';
     }
 
-    const cleanFullDesc = (r.full_description || '')
-      .replace(/\s*\(Standard Single\)/gi, '')
-      .replace(/\s*\(Deluxe Twin\)/gi, '')
-      .replace(/\s*\(Family Suite\)/gi, '');
+    const cleanFullDesc = normalizeRoomWording(
+      (r.full_description || '')
+        .replace(/\s*\(Standard Single\)/gi, '')
+        .replace(/\s*\(Deluxe Twin\)/gi, '')
+        .replace(/\s*\(Family Suite\)/gi, '')
+    );
 
     const legacyAmenityMap: Record<string, string> = {
       wifi: 'Wi-Fi tốc độ cao miễn phí',
@@ -303,7 +325,7 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     normalizeRoomsList(loadFromStorage(STORAGE_KEYS.ROOMS, INITIAL_ROOMS))
   );
   const [bookings, setBookings] = useState<Booking[]>(() =>
-    loadFromStorage(STORAGE_KEYS.BOOKINGS, INITIAL_BOOKINGS)
+    loadFromStorage(STORAGE_KEYS.BOOKINGS, INITIAL_BOOKINGS).map(normalizeBooking)
   );
   const [bookingHistory, setBookingHistory] = useState<BookingStatusHistory[]>(() =>
     loadFromStorage(STORAGE_KEYS.BOOKING_HISTORY, [
@@ -452,7 +474,7 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           setPageSeoList(remote.pageSeoList);
         }
         if (remote.bookings && remote.bookings.length > 0) {
-          setBookings(remote.bookings);
+          setBookings(remote.bookings.map(normalizeBooking));
         }
         if (remote.contactMessages && remote.contactMessages.length > 0) {
           setContactMessages(remote.contactMessages);
@@ -484,12 +506,12 @@ export const HotelDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         { event: '*', schema: 'public', table: 'bookings' },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            const inserted = payload.new as Booking;
+            const inserted = normalizeBooking(payload.new as Booking);
             setBookings((prev) =>
               prev.some((b) => b.id === inserted.id) ? prev : [inserted, ...prev]
             );
           } else if (payload.eventType === 'UPDATE') {
-            const updated = payload.new as Booking;
+            const updated = normalizeBooking(payload.new as Booking);
             setBookings((prev) =>
               prev.map((b) => (b.id === updated.id ? updated : b))
             );
