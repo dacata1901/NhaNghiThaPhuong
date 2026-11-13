@@ -182,18 +182,27 @@ function getRoomSortWeight(r: Room): number {
 function normalizeRoomWording(text?: string): string {
   if (!text) return '';
   return text
+    .replace(/\s*\([^)]*giường[^)]*\)/gi, '')
+    .replace(/\s*\(Standard Single\)/gi, '')
+    .replace(/\s*\(Deluxe Twin\)/gi, '')
+    .replace(/\s*\(Family Suite\)/gi, '')
+    .replace(/Phòng\s*Đơn\s*1\s*Giường\s*Đôi/gi, 'Phòng 1 Giường')
+    .replace(/Phòng\s*Đôi\s*2\s*Giường\s*Lớn/gi, 'Phòng 2 Giường')
+    .replace(/Phòng\s*Gia\s*Đình\s*3\s*Giường/gi, 'Phòng 3 Giường')
     .replace(/Phòng\s*1\s*Người/g, 'Phòng 1 Giường')
     .replace(/Phòng\s*2\s*Người/g, 'Phòng 2 Giường')
     .replace(/Phòng\s*3\s*Người/g, 'Phòng 3 Giường')
     .replace(/phòng\s*1\s*người/gi, 'phòng 1 giường')
     .replace(/phòng\s*2\s*người/gi, 'phòng 2 giường')
-    .replace(/phòng\s*3\s*người/gi, 'phòng 3 giường');
+    .replace(/phòng\s*3\s*người/gi, 'phòng 3 giường')
+    .trim();
 }
 
 function normalizeBooking(b: Booking): Booking {
+  const cleanedName = b.room_name ? normalizeRoomWording(b.room_name) : b.room_name;
   return {
     ...b,
-    room_name: b.room_name ? normalizeRoomWording(b.room_name) : b.room_name,
+    room_name: cleanedName,
   };
 }
 

@@ -309,10 +309,7 @@ export const AdminBookingsPage: React.FC = () => {
                       <div className="font-extrabold text-base text-text-primary">
                         {bk.guest_name}
                       </div>
-                      <div className="text-xs font-extrabold text-brand-gold-dark mt-0.5">
-                        SĐT: {bk.guest_phone}
-                      </div>
-                      <div className="mt-2">
+                      <div className="mt-1.5">
                         <PhoneActions
                           phone={bk.guest_phone}
                           size="sm"
