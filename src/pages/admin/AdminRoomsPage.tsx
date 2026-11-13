@@ -671,60 +671,16 @@ export const AdminRoomsPage: React.FC = () => {
               </div>
 
               {/* Custom amenity input */}
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                  type="text"
-                  value={newAmenityName}
-                  onChange={(e) => setNewAmenityName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      const trimmed = newAmenityName.trim();
-                      if (!trimmed) return;
-                      const currentList = editingRoom.amenities || [];
-                      if (
-                        currentList.some(
-                          (a) => a.name.trim().toLowerCase() === trimmed.toLowerCase()
-                        )
-                      ) {
-                        setNewAmenityName('');
-                        return;
-                      }
-                      setEditingRoom({
-                        ...editingRoom,
-                        amenities: [
-                          ...currentList,
-                          {
-                            id: `am-${Date.now()}`,
-                            code: slugifyVN(trimmed),
-                            name: trimmed,
-                            icon_name: 'Check',
-                            is_featured_home: true,
-                          },
-                        ],
-                      });
-                      setNewAmenityName('');
-                    }
-                  }}
-                  placeholder="Nhập thêm tiện nghi khác (VD: Tủ lạnh mini, Ban công...)"
-                  className="flex-1 h-10 px-3.5 rounded-xl bg-white border border-border-default text-sm font-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold"
-                />
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => {
-                    const trimmed = newAmenityName.trim();
-                    if (!trimmed) return;
-                    const currentList = editingRoom.amenities || [];
-                    if (
-                      currentList.some(
-                        (a) => a.name.trim().toLowerCase() === trimmed.toLowerCase()
-                      )
-                    ) {
-                      setNewAmenityName('');
-                      return;
-                    }
+              {(() => {
+                const addCustomAmenity = () => {
+                  const trimmed = newAmenityName.trim();
+                  if (!trimmed) return;
+                  const currentList = editingRoom.amenities || [];
+                  if (
+                    !currentList.some(
+                      (a) => a.name.trim().toLowerCase() === trimmed.toLowerCase()
+                    )
+                  ) {
                     setEditingRoom({
                       ...editingRoom,
                       amenities: [
@@ -738,13 +694,37 @@ export const AdminRoomsPage: React.FC = () => {
                         },
                       ],
                     });
-                    setNewAmenityName('');
-                  }}
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Thêm tiện nghi</span>
-                </Button>
-              </div>
+                  }
+                  setNewAmenityName('');
+                };
+
+                return (
+                  <div className="flex items-stretch gap-2">
+                    <input
+                      type="text"
+                      value={newAmenityName}
+                      onChange={(e) => setNewAmenityName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          addCustomAmenity();
+                        }
+                      }}
+                      placeholder="Thêm tiện nghi khác (VD: Tủ lạnh mini, Ban công...)"
+                      className="flex-1 min-w-0 h-11 px-4 rounded-xl bg-white border border-border-default text-sm font-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20 transition"
+                    />
+                    <button
+                      type="button"
+                      onClick={addCustomAmenity}
+                      disabled={!newAmenityName.trim()}
+                      className="shrink-0 h-11 inline-flex items-center justify-center gap-1.5 px-4 rounded-xl bg-brand-gold text-white text-sm font-extrabold whitespace-nowrap shadow-sm hover:bg-brand-gold-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Thêm</span>
+                    </button>
+                  </div>
+                );
+              })()}
 
               {/* Active amenities list */}
               {(editingRoom.amenities || []).length > 0 && (
