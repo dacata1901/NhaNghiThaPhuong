@@ -235,7 +235,7 @@ export const BookingPage: React.FC = () => {
                   Đăng Ký Đặt Phòng
                 </h1>
                 <p className="text-sm sm:text-base text-text-secondary mt-1 font-semibold">
-                  Chọn loại phòng theo thứ tự (1 Người, 2 Người, 3 Người), nhập Tên, Số điện thoại và Giờ nhận phòng cụ thể
+                  Chọn loại phòng theo thứ tự (1 Giường, 2 Giường, 3 Giường), nhập Tên, Số điện thoại và Giờ nhận phòng cụ thể
                 </p>
               </div>
 
@@ -247,7 +247,7 @@ export const BookingPage: React.FC = () => {
               )}
 
               <form onSubmit={handleSubmit(onPreSubmit)} className="space-y-6" noValidate>
-                {/* 1. Chọn loại phòng (Theo đúng thứ tự: Phòng 1 Người -> Phòng 2 Người -> Phòng 3 Người) */}
+                {/* 1. Chọn loại phòng (Theo đúng thứ tự: Phòng 1 Giường -> Phòng 2 Giường -> Phòng 3 Giường) */}
                 <div>
                   <label className="block text-sm sm:text-base font-extrabold text-text-primary mb-3">
                     1. Chọn loại phòng bạn muốn đặt:

@@ -80,10 +80,10 @@ export const INITIAL_ROOMS: Room[] = [
   {
     id: 'room-1-bed',
     room_code: 'TP-101',
-    name: 'Phòng 1 Người (1 Giường)',
+    name: 'Phòng 1 Giường',
     slug: 'phong-1-giuong-doi-standard',
     room_type: '1_bed',
-    room_type_label: 'Phòng 1 người',
+    room_type_label: 'Phòng 1 giường',
     bed_count: 1,
     max_adults: 2,
     max_children: 1,
@@ -93,9 +93,9 @@ export const INITIAL_ROOMS: Room[] = [
     short_description:
       'Không gian riêng tư, sạch sẽ với 1 giường êm ái, ốp tường vân gỗ ấm cúng, ghế thư giãn, điều hòa, TV và phòng tắm riêng có bình nóng lạnh.',
     full_description:
-      'Phòng 1 Người (1 Giường) tại Nhà Nghỉ Tha Phương được thiết kế tối ưu cho khách đi công tác, du lịch cá nhân hoặc cặp đôi cần sự yên tĩnh, sạch sẽ và tiện nghi. Phòng sử dụng tông nội thất ốp lam gỗ ấm áp kết hợp sàn gạch vân đá sáng bóng, trang bị đầy đủ điều hòa nhiệt độ, quạt mát, tivi màn hình phẳng, ghế sofa thư giãn và phòng tắm khép kín có máy nước nóng Ariston.',
+      'Phòng 1 Giường tại Nhà Nghỉ Tha Phương được thiết kế tối ưu cho khách cần sự yên tĩnh, sạch sẽ và tiện nghi. Phòng sử dụng tông nội thất ốp lam gỗ ấm áp kết hợp sàn gạch vân đá sáng bóng, trang bị đầy đủ điều hòa nhiệt độ, quạt mát, tivi màn hình phẳng, ghế sofa thư giãn và phòng tắm khép kín có máy nước nóng Ariston.',
     policies:
-      'Nhận phòng linh hoạt 24/7. Vui lòng xuất trình giấy tờ tùy thân (CCCD/CMND/Hộ chiếu) khi làm thủ tục nhận phòng.',
+      'Thời gian nhận và trả phòng linh hoạt. Vui lòng xuất trình giấy tờ tùy thân (CCCD/CMND/Hộ chiếu) khi làm thủ tục nhận phòng.',
     status: 'available',
     is_published: true,
     is_featured: true,
@@ -108,7 +108,7 @@ export const INITIAL_ROOMS: Room[] = [
         room_id: 'room-1-bed',
         media_type: 'image',
         url: '/images/rooms/phong-1-giuong/giuong-chinh-1.jpg',
-        alt_text: 'Phòng 1 người Nhà Nghỉ Tha Phương - Giường ngủ chính ấm cúng',
+        alt_text: 'Phòng 1 giường Nhà Nghỉ Tha Phương - Giường ngủ chính ấm cúng',
         is_primary: true,
         sort_order: 1,
       },
@@ -117,7 +117,7 @@ export const INITIAL_ROOMS: Room[] = [
         room_id: 'room-1-bed',
         media_type: 'image',
         url: '/images/rooms/phong-1-giuong/khong-gian-phong.jpg',
-        alt_text: 'Toàn cảnh không gian phòng 1 người với ghế thư giãn tại Nhà Nghỉ Tha Phương',
+        alt_text: 'Toàn cảnh không gian phòng 1 giường với ghế thư giãn tại Nhà Nghỉ Tha Phương',
         is_primary: false,
         sort_order: 2,
       },
@@ -165,10 +165,10 @@ export const INITIAL_ROOMS: Room[] = [
   {
     id: 'room-2-beds',
     room_code: 'TP-201',
-    name: 'Phòng 2 Người (2 Giường)',
+    name: 'Phòng 2 Giường',
     slug: 'phong-2-giuong-deluxe-twin',
     room_type: '2_beds',
-    room_type_label: 'Phòng 2 người',
+    room_type_label: 'Phòng 2 giường',
     bed_count: 2,
     max_adults: 2,
     max_children: 1,
@@ -178,9 +178,9 @@ export const INITIAL_ROOMS: Room[] = [
     short_description:
       'Phòng rộng rãi với 2 giường lớn thoải mái, đầy đủ điều hòa, TV, Wi-Fi tốc độ cao và phòng tắm khép kín sạch sẽ.',
     full_description:
-      'Phòng 2 Người (2 Giường) mang đến không gian sinh hoạt thoải mái, được bố trí 2 giường ngủ êm ái, lối đi rộng thoáng, ốp tường gỗ sang trọng, đầy đủ điều hòa, quạt mát, tivi màn hình phẳng và phòng tắm riêng có bình nóng lạnh.',
+      'Phòng 2 Giường mang đến không gian sinh hoạt thoải mái, được bố trí 2 giường ngủ êm ái, lối đi rộng thoáng, ốp tường gỗ sang trọng, đầy đủ điều hòa, quạt mát, tivi màn hình phẳng và phòng tắm riêng có bình nóng lạnh.',
     policies:
-      'Nhận phòng linh hoạt 24/7. Hỗ trợ đón khách chu đáo.',
+      'Thời gian nhận và trả phòng linh hoạt. Hỗ trợ đón khách chu đáo.',
     status: 'available',
     is_published: true,
     is_featured: true,
@@ -223,10 +223,10 @@ export const INITIAL_ROOMS: Room[] = [
   {
     id: 'room-3-beds',
     room_code: 'TP-301',
-    name: 'Phòng 3 Người (3 Giường)',
+    name: 'Phòng 3 Giường',
     slug: 'phong-3-giuong-family-suite',
     room_type: '3_beds',
-    room_type_label: 'Phòng 3 người',
+    room_type_label: 'Phòng 3 giường',
     bed_count: 3,
     max_adults: 3,
     max_children: 2,
@@ -234,11 +234,11 @@ export const INITIAL_ROOMS: Room[] = [
     price_per_night: 650000,
     total_quantity: 2,
     short_description:
-      'Phòng rộng rãi dành cho nhóm 3 người hoặc gia đình có 3 giường ngủ êm ái, đầy đủ điều hòa, TV, Wi-Fi tốc độ cao và phòng tắm riêng.',
+      'Phòng rộng rãi với 3 giường ngủ êm ái, đầy đủ điều hòa, TV, Wi-Fi tốc độ cao và phòng tắm riêng.',
     full_description:
-      'Phòng 3 Người (3 Giường) là lựa chọn lý tưởng cho nhóm 3 người hoặc gia đình muốn ở chung một phòng rộng rãi, ấm cúng và tiện lợi. Không gian phòng thoáng đãng, sạch sẽ, trang bị đầy đủ điều hòa, quạt mát, tivi, Wi-Fi tốc độ cao và phòng tắm riêng biệt có bình nóng lạnh.',
+      'Phòng 3 Giường là lựa chọn lý tưởng cho nhóm bạn hoặc gia đình muốn ở chung một phòng rộng rãi, ấm cúng và tiện lợi. Không gian phòng thoáng đãng, sạch sẽ, trang bị đầy đủ điều hòa, quạt mát, tivi, Wi-Fi tốc độ cao và phòng tắm riêng biệt có bình nóng lạnh.',
     policies:
-      'Nhận phòng từ 14:00 – Trả phòng trước 12:00. Hỗ trợ nhận phòng linh hoạt 24/7.',
+      'Thời gian nhận và trả phòng linh hoạt 24/7.',
     status: 'available',
     is_published: true,
     is_featured: true,

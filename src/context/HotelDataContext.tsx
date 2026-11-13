@@ -187,11 +187,11 @@ function normalizeRoomsList(rawRooms: Room[]): Room[] {
       .replace(/\s*\(Family Suite\)/gi, '');
 
     if (r.id === 'room-1-bed' || r.room_type === '1_bed') {
-      cleanName = 'Phòng 1 Người (1 Giường)';
+      cleanName = 'Phòng 1 Giường';
     } else if (r.id === 'room-2-beds' || r.room_type === '2_beds') {
-      cleanName = 'Phòng 2 Người (2 Giường)';
+      cleanName = 'Phòng 2 Giường';
     } else if (r.id === 'room-3-beds' || r.room_type === '3_beds') {
-      cleanName = 'Phòng 3 Người (3 Giường)';
+      cleanName = 'Phòng 3 Giường';
     }
 
     const cleanFullDesc = (r.full_description || '')
@@ -204,17 +204,17 @@ function normalizeRoomsList(rawRooms: Room[]): Room[] {
       name: cleanName,
       room_type_label:
         r.room_type === '1_bed'
-          ? 'Phòng 1 người'
+          ? 'Phòng 1 giường'
           : r.room_type === '2_beds'
-          ? 'Phòng 2 người'
+          ? 'Phòng 2 giường'
           : r.room_type === '3_beds'
-          ? 'Phòng 3 người'
+          ? 'Phòng 3 giường'
           : r.room_type_label,
       full_description: cleanFullDesc,
     };
   });
 
-  // Đảm bảo luôn có đủ 3 phòng (Phòng 1 Người, Phòng 2 Người, Phòng 3 Người)
+  // Đảm bảo luôn có đủ 3 phòng (Phòng 1 Giường, Phòng 2 Giường, Phòng 3 Giường)
   INITIAL_ROOMS.forEach((seedRoom) => {
     const exists = cleaned.some(
       (r) => r.id === seedRoom.id || r.room_type === seedRoom.room_type
@@ -224,7 +224,7 @@ function normalizeRoomsList(rawRooms: Room[]): Room[] {
     }
   });
 
-  // Sắp xếp cố định theo thứ tự: Phòng 1 người -> Phòng 2 người -> Phòng 3 người
+  // Sắp xếp cố định theo thứ tự: Phòng 1 giường -> Phòng 2 giường -> Phòng 3 giường
   return cleaned.sort((a, b) => getRoomSortWeight(a) - getRoomSortWeight(b));
 }
 

@@ -22,7 +22,7 @@ export const RoomListPage: React.FC = () => {
     <>
       <SEOHead
         title="Các Loại Phòng Nghỉ | Nhà Nghỉ Tha Phương"
-        description="Danh sách các loại phòng nghỉ 1 người, 2 người và 3 người sạch sẽ, tiện nghi tại Nhà Nghỉ Tha Phương."
+        description="Danh sách các loại phòng nghỉ 1 giường, 2 giường và 3 giường sạch sẽ, tiện nghi tại Nhà Nghỉ Tha Phương."
         canonicalPath="/rooms"
       />
 
@@ -33,16 +33,16 @@ export const RoomListPage: React.FC = () => {
               Các Loại Phòng Nghỉ
             </h1>
             <p className="text-sm sm:text-base font-semibold text-text-secondary mt-2">
-              Chọn loại phòng phù hợp theo thứ tự: Phòng 1 Người, Phòng 2 Người hoặc Phòng 3 Người
+              Chọn loại phòng phù hợp theo thứ tự: Phòng 1 Giường, Phòng 2 Giường hoặc Phòng 3 Giường
             </p>
 
             {/* Nút chọn nhanh loại phòng theo đúng thứ tự 1 -> 2 -> 3 */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mt-6 bg-bg-ivory-white p-2 rounded-2xl border border-border-default shadow-xs w-full max-w-4xl mx-auto">
               {[
                 { key: 'all', label: 'Tất cả loại phòng' },
-                { key: '1_bed', label: 'Phòng 1 Người (1 Giường)' },
-                { key: '2_beds', label: 'Phòng 2 Người (2 Giường)' },
-                { key: '3_beds', label: 'Phòng 3 Người (3 Giường)' },
+                { key: '1_bed', label: 'Phòng 1 Giường' },
+                { key: '2_beds', label: 'Phòng 2 Giường' },
+                { key: '3_beds', label: 'Phòng 3 Giường' },
               ].map((tab) => (
                 <button
                   key={tab.key}

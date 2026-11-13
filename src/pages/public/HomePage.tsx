@@ -75,7 +75,7 @@ export const HomePage: React.FC = () => {
             Không Gian Nghỉ Ngơi Sạch Sẽ, Riêng Tư &amp; Tiện Nghi
           </h1>
           <p className="text-base sm:text-xl text-white/90 max-w-3xl mt-6 leading-relaxed font-semibold">
-            Đặt giữ phòng trực tuyến nhanh gọn — Có đầy đủ <strong>Phòng 1 Người, Phòng 2 Người và Phòng 3 Người</strong>. Chỉ cần chọn loại phòng, nhập Tên, Số điện thoại và Giờ nhận phòng cụ thể.
+            Đặt giữ phòng trực tuyến nhanh gọn — Có đầy đủ <strong>Phòng 1 Giường, Phòng 2 Giường và Phòng 3 Giường</strong>. Chỉ cần chọn loại phòng, nhập Tên, Số điện thoại và Giờ nhận phòng cụ thể.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-[420px] mt-9">
@@ -105,13 +105,13 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. CÁC LOẠI PHÒNG NGHỈ (THEO THỨ TỰ: PHÒNG 1 NGƯỜI -> PHÒNG 2 NGƯỜI -> PHÒNG 3 NGƯỜI) */}
+      {/* 2. CÁC LOẠI PHÒNG NGHỈ (THEO THỨ TỰ: PHÒNG 1 GIƯỜNG -> PHÒNG 2 GIƯỜNG -> PHÒNG 3 GIƯỜNG) */}
       <section className="py-16 sm:py-24 bg-bg-ivory border-b border-border-default">
         <div className="container-luxury">
           <SectionHeading
             eyebrow="Chọn hạng phòng phù hợp"
             title="Các Loại Phòng Nghỉ Tại Nhà Nghỉ Tha Phương"
-            subtitle="Quý khách bấm chọn loại phòng muốn đặt bên dưới (Phòng 1 Người, Phòng 2 Người hoặc Phòng 3 Người) để đăng ký tên, số điện thoại và giờ nhận phòng."
+            subtitle="Quý khách bấm chọn loại phòng muốn đặt bên dưới (Phòng 1 Giường, Phòng 2 Giường hoặc Phòng 3 Giường) để đăng ký tên, số điện thoại và giờ nhận phòng."
           />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mt-12">
